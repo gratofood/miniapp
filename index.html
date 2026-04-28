@@ -1,24 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Menu</title>
+<meta charset="UTF-8">
+<title>Menu</title>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body { font-family:sans-serif; text-align:center; background:#f5f5f5; }
+
+button {
+    display:block;
+    width:80%;
+    margin:10px auto;
+    padding:15px;
+    font-size:18px;
+    border-radius:10px;
+    border:none;
+    background:#2ecc71;
+    color:white;
+}
+
+.cart {
+    margin-top:20px;
+    padding:10px;
+    background:white;
+}
+</style>
 </head>
 
-<body style="font-family:sans-serif; text-align:center;">
+<body>
 
 <h2>🍔 Menu</h2>
 
-<button onclick="send('Burger')">Burger</button><br><br>
-<button onclick="send('Lavash')">Lavash</button><br><br>
-<button onclick="send('Cola')">Cola</button>
+<button onclick="add('Burger')">Burger</button>
+<button onclick="add('Lavash')">Lavash</button>
+<button onclick="add('Cola')">Cola</button>
+
+<div class="cart" id="cart">
+    🛒 Savat bo'sh
+</div>
 
 <script>
-    function send(item){
-        Telegram.WebApp.sendData(item)
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+let cart = [];
+
+function add(item){
+    cart.push(item);
+    renderCart();
+}
+
+function remove(item){
+    const index = cart.indexOf(item);
+    if(index > -1){
+        cart.splice(index,1);
     }
+    renderCart();
+}
+
+function renderCart(){
+    const div = document.getElementById("cart");
+
+    if(cart.length === 0){
+        div.innerHTML = "🛒 Savat bo'sh";
+        tg.MainButton.hide();
+        return;
+    }
+
+    let text = "🛒 Savat:<br><br>";
+
+    let counts = {};
+    cart.forEach(i => counts[i] = (counts[i] || 0) + 1);
+
+    for(let item in counts){
+        text += `${item} x${counts[item]} 
+        <button onclick="remove('${item}')">❌</button><br>`;
+    }
+
+    div.innerHTML = text;
+
+    tg.MainButton.setText("Buyurtma berish");
+    tg.MainButton.show();
+}
+
+tg.MainButton.onClick(function(){
+    tg.sendData(JSON.stringify(cart));
+});
 </script>
 
 </body>
