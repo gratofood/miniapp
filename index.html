@@ -13,14 +13,12 @@ body {
     background:#f2f2f7;
 }
 
-/* HEADER */
 .header {
     padding:16px;
     font-size:22px;
     font-weight:600;
 }
 
-/* GRID */
 .grid {
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -28,7 +26,6 @@ body {
     padding:10px;
 }
 
-/* CARD */
 .card {
     background:white;
     border-radius:16px;
@@ -53,7 +50,6 @@ body {
     font-size:14px;
 }
 
-/* BUTTON */
 .add-btn {
     position:absolute;
     right:10px;
@@ -71,7 +67,6 @@ body {
     position:relative;
 }
 
-/* CART */
 .cart {
     position:fixed;
     bottom:0;
@@ -138,11 +133,13 @@ tg.expand();
 
 let cart = [];
 
+// ➕ qo‘shish
 function add(item){
     cart.push(item);
     render();
 }
 
+// ❌ o‘chirish
 function remove(item){
     const i = cart.indexOf(item);
     if(i > -1){
@@ -151,6 +148,7 @@ function remove(item){
     render();
 }
 
+// 🔄 render
 function render(){
     const div = document.getElementById("cart");
 
@@ -175,12 +173,21 @@ function render(){
 
     div.innerHTML = html;
 
+    // 🔥 BUTTON CONFIG
     tg.MainButton.setText("Buyurtma berish");
     tg.MainButton.show();
 }
 
+// 🚀 BUYURTMA BOSILGANDA
 tg.MainButton.onClick(function(){
+
+    if(cart.length === 0){
+        alert("Savat bo'sh ❌");
+        return;
+    }
+
     tg.sendData(JSON.stringify(cart));
+
 });
 </script>
 
