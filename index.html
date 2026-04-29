@@ -131,64 +131,97 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-let cart = [];
+// 🔥 USER ID (ENG MUHIM)
+const user_id = tg.initDataUnsafe.user?.id;
 
-// ➕ qo‘shish
+// 🔴 BU URLNI O'ZGARTIR!
+const API = "https://YOUR-RAILWAY-URL";
+
+
+// ➕ ADD (DB ga yozadi)
 function add(item){
-    cart.push(item);
-    render();
+    fetch(API + "/cart/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: user_id,
+            item: item
+        })
+    }).then(loadCart);
 }
 
-// ❌ o‘chirish
-function remove(item){
-    const i = cart.indexOf(item);
-    if(i > -1){
-        cart.splice(i,1);
-    }
-    render();
+
+// ❌ REMOVE (DB dan o‘chiradi)
+function removeItem(item){
+    fetch(API + "/cart/remove", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: user_id,
+            item: item
+        })
+    }).then(loadCart);
 }
 
-// 🔄 render
-function render(){
-    const div = document.getElementById("cart");
 
-    if(cart.length === 0){
-        div.innerHTML = "Savat bo'sh";
-        tg.MainButton.hide();
-        return;
-    }
+// 🔄 CART LOAD (DB dan oladi)
+function loadCart(){
+    fetch(API + "/cart/" + user_id)
+    .then(res => res.json())
+    .then(cart => {
 
-    let counts = {};
-    cart.forEach(i => counts[i] = (counts[i]||0)+1);
+        const div = document.getElementById("cart");
 
-    let html = "";
+        if(!cart || cart.length === 0){
+            div.innerHTML = "Savat bo'sh";
+            tg.MainButton.hide();
+            return;
+        }
 
-    for(let item in counts){
-        html += `
-        <div>
-            ${item} x${counts[item]}
-            <button class="remove" onclick="remove('${item}')">❌</button>
-        </div>`;
-    }
+        let counts = {};
+        cart.forEach(i => counts[i] = (counts[i]||0)+1);
 
-    div.innerHTML = html;
+        let html = "";
 
-    // 🔥 BUTTON CONFIG
-    tg.MainButton.setText("Buyurtma berish");
-    tg.MainButton.show();
+        for(let item in counts){
+            html += `
+            <div>
+                ${item} x${counts[item]}
+                <button class="remove" onclick="removeItem('${item}')">❌</button>
+            </div>`;
+        }
+
+        div.innerHTML = html;
+
+        tg.MainButton.setText("Buyurtma berish");
+        tg.MainButton.show();
+    });
 }
 
-// 🚀 BUYURTMA BOSILGANDA
+
+// 🚀 BUYURTMA
 tg.MainButton.onClick(function(){
-
-    if(cart.length === 0){
-        alert("Savat bo'sh ❌");
-        return;
-    }
-
-    tg.sendData(JSON.stringify(cart));
-
+    fetch(API + "/order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: user_id
+        })
+    }).then(() => {
+        alert("Buyurtma yuborildi ✅");
+        loadCart();
+    });
 });
+
+
+// 🔥 PAGE LOAD
+loadCart();
 </script>
 
 </body>
