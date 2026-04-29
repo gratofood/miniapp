@@ -12,44 +12,30 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     background:#f2f2f7;
 }
-
 .header {
     padding:16px;
     font-size:22px;
     font-weight:600;
 }
-
 .grid {
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:12px;
     padding:10px;
 }
-
 .card {
     background:white;
     border-radius:16px;
     padding:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.05);
 }
-
 .card img {
     width:100%;
     height:120px;
     object-fit:cover;
     border-radius:12px;
 }
-
-.title {
-    font-weight:600;
-    margin-top:8px;
-}
-
-.price {
-    color:#666;
-    font-size:14px;
-}
-
+.title { font-weight:600; margin-top:8px; }
+.price { color:#666; font-size:14px; }
 .add-btn {
     position:absolute;
     right:10px;
@@ -62,11 +48,7 @@ body {
     color:white;
     font-size:22px;
 }
-
-.card-wrap {
-    position:relative;
-}
-
+.card-wrap { position:relative; }
 .cart {
     position:fixed;
     bottom:0;
@@ -74,9 +56,7 @@ body {
     background:white;
     padding:15px;
     border-top:1px solid #ddd;
-    border-radius:20px 20px 0 0;
 }
-
 .remove {
     background:red;
     color:white;
@@ -94,49 +74,42 @@ body {
 
 <div class="grid">
 
-    <div class="card">
-        <div class="card-wrap">
-            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd">
-            <button class="add-btn" onclick="add('Burger')">+</button>
-        </div>
-        <div class="title">Burger</div>
-        <div class="price">25 000 so'm</div>
-    </div>
+<div class="card">
+<div class="card-wrap">
+<img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd">
+<button class="add-btn" onclick="add('Burger')">+</button>
+</div>
+<div class="title">Burger</div>
+<div class="price">25 000 so'm</div>
+</div>
 
-    <div class="card">
-        <div class="card-wrap">
-            <img src="https://images.unsplash.com/photo-1604908176997-431efae1b1d1">
-            <button class="add-btn" onclick="add('Lavash')">+</button>
-        </div>
-        <div class="title">Lavash</div>
-        <div class="price">30 000 so'm</div>
-    </div>
+<div class="card">
+<div class="card-wrap">
+<img src="https://images.unsplash.com/photo-1604908176997-431efae1b1d1">
+<button class="add-btn" onclick="add('Lavash')">+</button>
+</div>
+<div class="title">Lavash</div>
+<div class="price">30 000 so'm</div>
+</div>
 
-    <div class="card">
-        <div class="card-wrap">
-            <img src="https://images.unsplash.com/photo-1580910051074-3eb694886505">
-            <button class="add-btn" onclick="add('Cola')">+</button>
-        </div>
-        <div class="title">Cola</div>
-        <div class="price">10 000 so'm</div>
-    </div>
+<div class="card">
+<div class="card-wrap">
+<img src="https://images.unsplash.com/photo-1580910051074-3eb694886505">
+<button class="add-btn" onclick="add('Cola')">+</button>
+</div>
+<div class="title">Cola</div>
+<div class="price">10 000 so'm</div>
+</div>
 
 </div>
 
-<div class="cart" id="cart">
-    Savat bo'sh
-</div>
+<div class="cart" id="cart">Savat bo'sh</div>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// ❗ faqat Telegram ichida ishlaydi
-if (!tg.initDataUnsafe.user) {
-    document.body.innerHTML = "Telegram ichida oching ❌";
-}
-
-// 🔥 LOCAL CART
+// 🔥 MUHIM: STATE
 let cart = [];
 
 // ➕ ADD
@@ -147,10 +120,8 @@ function add(item){
 
 // ❌ REMOVE
 function removeItem(item){
-    const index = cart.indexOf(item);
-    if(index > -1){
-        cart.splice(index, 1);
-    }
+    const i = cart.indexOf(item);
+    if(i > -1) cart.splice(i,1);
     renderCart();
 }
 
@@ -168,7 +139,6 @@ function renderCart(){
     cart.forEach(i => counts[i] = (counts[i]||0)+1);
 
     let html = "";
-
     for(let item in counts){
         html += `
         <div>
@@ -183,7 +153,7 @@ function renderCart(){
     tg.MainButton.show();
 }
 
-// 🚀 ORDER (ENG MUHIM JOY)
+// 🚀 ORDER
 tg.MainButton.onClick(function(){
 
     if(cart.length === 0){
@@ -191,9 +161,8 @@ tg.MainButton.onClick(function(){
         return;
     }
 
-    tg.sendData(JSON.stringify(cart)); // 🔥 BOTGA YUBORILADI
+    tg.sendData(JSON.stringify(cart)); // BOTGA KETADI
 });
-
 </script>
 
 </body>
