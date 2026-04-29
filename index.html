@@ -109,7 +109,6 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// 🔥 MUHIM: STATE
 let cart = [];
 
 // ➕ ADD
@@ -161,7 +160,23 @@ tg.MainButton.onClick(function(){
         return;
     }
 
-    tg.sendData(JSON.stringify(cart)); // BOTGA KETADI
+    let name = prompt("Ismingiz:");
+    if(!name) return;
+
+    let phone = prompt("Telefon raqamingiz:");
+    if(!phone) return;
+
+    let address = prompt("Manzilingiz:");
+    if(!address) return;
+
+    const order = {
+        name: name,
+        phone: phone,
+        address: address,
+        items: cart
+    };
+
+    tg.sendData(JSON.stringify(order));
 });
 </script>
 
