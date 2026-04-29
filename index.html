@@ -1,55 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
 <meta charset="UTF-8">
-<title>Menu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menyu</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-body {margin:0;font-family:sans-serif;background:#f2f2f7;}
-.header {padding:16px;font-size:22px;font-weight:600;}
-.grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px;}
-.card {background:white;border-radius:16px;padding:10px;}
-.card img {width:100%;height:120px;object-fit:cover;border-radius:12px;}
-.add-btn {position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;border:none;background:black;color:white;font-size:22px;}
-.card-wrap {position:relative;}
-.cart {position:fixed;bottom:0;width:100%;background:white;padding:15px;border-top:1px solid #ddd;}
-.remove {background:red;color:white;border:none;border-radius:8px;padding:4px 8px;margin-left:10px;}
+body {margin:0;font-family:sans-serif;background:#0f0f0f;color:white;}
+h2 {text-align:center;margin:10px 0;}
 
+.search-wrap {display:flex;justify-content:center;padding:0 15px 10px;}
+#searchInput {width:100%;padding:10px;border-radius:12px;border:1px solid #333;background:#1a1a1a;color:#fff;}
+
+.buttons {display:flex;justify-content:center;gap:10px;margin-bottom:10px;}
+button {padding:10px 15px;border:none;border-radius:20px;background:#222;color:white;cursor:pointer;}
+button.active {background:#ef7918;}
+
+.menu {display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;padding:15px;}
+
+.card {position:relative;border-radius:15px;overflow:hidden;}
+.card img {width:100%;height:180px;object-fit:cover;}
+
+.add-btn {
+position:absolute;
+top:10px;
+right:10px;
+background:#ef7918;
+border:none;
+border-radius:50%;
+width:40px;
+height:40px;
+color:white;
+font-size:20px;
+}
+
+.info {position:absolute;bottom:0;width:100%;padding:10px;background:linear-gradient(transparent,rgba(0,0,0,0.9));}
+.info h3 {margin:0;font-size:16px;}
+.info p {margin:5px 0 0;color:#ef7918;font-weight:bold;}
+
+.cart {
+position:fixed;
+bottom:0;
+width:100%;
+background:black;
+padding:10px;
+}
+
+/* FORM */
 #formScreen {display:none;padding:15px;}
-.form-card {background:white;border-radius:16px;padding:15px;margin-bottom:10px;}
-input {width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;}
-.primary-btn {width:100%;padding:14px;border:none;border-radius:12px;background:black;color:white;}
+.form-card {background:white;color:black;border-radius:12px;padding:10px;margin-bottom:10px;}
+input {width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;}
+.primary-btn {width:100%;padding:14px;background:#ef7918;color:white;border:none;border-radius:12px;}
 </style>
 </head>
 
 <body>
 
-<div class="header">🍔 Menu</div>
+<h2>Menyu</h2>
 
-<div class="grid" id="menuGrid"></div>
+<div class="search-wrap">
+<input id="searchInput" placeholder="Qidirish...">
+</div>
+
+<div class="buttons">
+<button onclick="filter('all', this)" class="active">Hammasi</button>
+<button onclick="filter('first', this)">1-taom</button>
+<button onclick="filter('second', this)">2-taom</button>
+<button onclick="filter('salat', this)">Salat</button>
+</div>
+
+<div class="menu" id="menu"></div>
 
 <div class="cart" id="cart">Savat bo'sh</div>
 
+<!-- FORM -->
 <div id="formScreen">
-
 <div class="form-card">
 <input id="name" placeholder="Ismingiz">
 </div>
 
 <div class="form-card">
-<input id="phone" placeholder="901234567" maxlength="9" inputmode="numeric">
+<input id="phone" placeholder="901234567" maxlength="9">
 </div>
 
 <div class="form-card">
-<button onclick="getLocation()" style="width:100%;padding:10px;">Lokatsiya olish</button>
+<button onclick="getLocation()">Lokatsiya olish</button>
 <div id="locStatus">Hali olinmadi</div>
 <input id="address" placeholder="Uy, kvartira">
 </div>
 
 <button class="primary-btn" onclick="submitOrder()">Yuborish</button>
-
 </div>
 
 <script>
@@ -59,54 +101,39 @@ tg.expand();
 let cart = [];
 let locationData = null;
 
-// 🔥 MENU (BU YERNI O‘ZGARTIRASAN)
+// 🔥 MENU (SENING RASMLAR)
 const MENU = [
-    {name:"Burger", price:"25000", img:"https://gratofood.github.io/miniapp/img/burger.jpg"},
-    {name:"Lavash", price:"30000", img:"https://gratofood.github.io/miniapp/img/lavash.jpg"},
-    {name:"Cola", price:"10000", img:"https://gratofood.github.io/miniapp/img/cola.jpg"}
+{type:"first", name:"Tushonka sho'rva", price:"40000", img:"images/1-taom/optimized_1.webp"},
+{type:"second", name:"Go'shtli somsa", price:"7000", img:"images/optimized_batch2_4.webp"},
+{type:"salat", name:"Adana salati", price:"40000", img:"images/Salatlar/Adana.webp"}
 ];
 
-// 🔥 MENU RENDER
+// RENDER
 function renderMenu(){
-    const grid = document.getElementById("menuGrid");
-    let html = "";
+    const grid=document.getElementById("menu");
+    grid.innerHTML="";
 
     MENU.forEach(item=>{
-        html += `
-        <div class="card">
-            <div class="card-wrap">
-                <img src="${item.img}">
-                <button class="add-btn" onclick="add('${item.name}')">+</button>
-            </div>
-            <div style="font-weight:600">${item.name}</div>
-            <div style="color:#666">${item.price} so'm</div>
+        grid.innerHTML+=`
+        <div class="card ${item.type}">
+        <img src="${item.img}">
+        <button class="add-btn" onclick="add('${item.name}')">+</button>
+        <div class="info">
+        <h3>${item.name}</h3>
+        <p>${item.price} so'm</p>
+        </div>
         </div>`;
     });
-
-    grid.innerHTML = html;
 }
-
-// phone only numbers
-document.getElementById("phone")?.addEventListener("input", function(e){
-    e.target.value = e.target.value.replace(/\D/g, "").slice(0,9);
-});
 
 function add(item){
     cart.push(item);
     renderCart();
 }
 
-function removeItem(item){
-    const i = cart.indexOf(item);
-    if(i>-1) cart.splice(i,1);
-    renderCart();
-}
-
 function renderCart(){
-    const div = document.getElementById("cart");
-
     if(cart.length===0){
-        div.innerHTML="Savat bo'sh";
+        document.getElementById("cart").innerText="Savat bo'sh";
         tg.MainButton.hide();
         return;
     }
@@ -114,62 +141,71 @@ function renderCart(){
     let counts={};
     cart.forEach(i=>counts[i]=(counts[i]||0)+1);
 
-    let html="";
-    for(let item in counts){
-        html+=`${item} x${counts[item]} <button onclick="removeItem('${item}')">❌</button><br>`;
+    let text="";
+    for(let i in counts){
+        text+=`${i} x${counts[i]}\n`;
     }
 
-    div.innerHTML=html;
+    document.getElementById("cart").innerText=text;
 
-    tg.MainButton.setText("Buyurtma berish");
+    tg.MainButton.setText("Buyurtma");
     tg.MainButton.show();
 }
 
-tg.MainButton.onClick(function(){
-    document.getElementById("menuGrid").style.display="none";
-    document.getElementById("cart").style.display="none";
-    document.getElementById("formScreen").style.display="block";
-    tg.MainButton.hide();
+tg.MainButton.onClick(()=>{
+document.querySelector(".menu").style.display="none";
+document.getElementById("cart").style.display="none";
+document.getElementById("formScreen").style.display="block";
+tg.MainButton.hide();
 });
 
 function getLocation(){
-    const status=document.getElementById("locStatus");
-
-    navigator.geolocation.getCurrentPosition(
-        pos=>{
-            locationData={
-                lat:pos.coords.latitude,
-                lon:pos.coords.longitude
-            };
-            status.innerText="Lokatsiya olindi ✅";
-        },
-        ()=>status.innerText="Ruxsat berilmadi ❌"
-    );
+navigator.geolocation.getCurrentPosition(pos=>{
+locationData={lat:pos.coords.latitude,lon:pos.coords.longitude};
+document.getElementById("locStatus").innerText="OK";
+});
 }
 
 function submitOrder(){
-    const name=document.getElementById("name").value.trim();
-    const phone=document.getElementById("phone").value.trim();
-    const address=document.getElementById("address").value.trim();
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value.replace(/\D/g,"");
+const address=document.getElementById("address").value;
 
-    const cleanPhone=phone.replace(/\D/g,"");
+if(name.length<2) return alert("Ism xato");
+if(phone.length!==9) return alert("9 ta raqam kiriting");
+if(!locationData) return alert("Lokatsiya yo‘q");
 
-    if(name.length<2) return alert("Ism xato");
-    if(cleanPhone.length!==9) return alert("Telefon 9 ta raqam bo‘lsin");
-    if(!locationData) return alert("Lokatsiyani oling");
-
-    const order={
-        name,
-        phone:cleanPhone,
-        address,
-        location:locationData,
-        items:cart
-    };
-
-    tg.sendData(JSON.stringify(order));
+tg.sendData(JSON.stringify({
+name,
+phone,
+address,
+location:locationData,
+items:cart
+}));
 }
 
-// 🔥 INIT
+// filter + search
+let currentFilter="all";
+const searchInput=document.getElementById("searchInput");
+
+function apply(){
+const q=searchInput.value.toLowerCase();
+document.querySelectorAll(".card").forEach(c=>{
+const title=c.innerText.toLowerCase();
+const show=(currentFilter==="all"||c.classList.contains(currentFilter)) && title.includes(q);
+c.style.display=show?"block":"none";
+});
+}
+
+function filter(type,btn){
+currentFilter=type;
+document.querySelectorAll(".buttons button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+apply();
+}
+
+searchInput.addEventListener("input",apply);
+
 renderMenu();
 </script>
 
