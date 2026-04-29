@@ -131,14 +131,20 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// 🔥 USER ID (ENG MUHIM)
+// 🔴 TELEGRAM USER
 const user_id = tg.initDataUnsafe.user?.id;
 
-// 🔴 BU URLNI O'ZGARTIR!
+// 🔴 SHUNI O'ZGARTIR!
 const API = "https://YOUR-RAILWAY-URL";
 
 
-// ➕ ADD (DB ga yozadi)
+// ❌ agar Telegram emas bo‘lsa — to‘xtatamiz
+if(!user_id){
+    alert("Iltimos Telegram ichida oching ❌");
+}
+
+
+// ➕ ADD
 function add(item){
     fetch(API + "/cart/add", {
         method: "POST",
@@ -153,7 +159,7 @@ function add(item){
 }
 
 
-// ❌ REMOVE (DB dan o‘chiradi)
+// ❌ REMOVE
 function removeItem(item){
     fetch(API + "/cart/remove", {
         method: "POST",
@@ -168,7 +174,7 @@ function removeItem(item){
 }
 
 
-// 🔄 CART LOAD (DB dan oladi)
+// 🔄 LOAD CART
 function loadCart(){
     fetch(API + "/cart/" + user_id)
     .then(res => res.json())
@@ -203,24 +209,43 @@ function loadCart(){
 }
 
 
-// 🚀 BUYURTMA
+// 🚀 ORDER
 tg.MainButton.onClick(function(){
+
+    if(!user_id){
+        alert("Telegram orqali oching ❌");
+        return;
+    }
+
+    let name = prompt("Ismingiz:");
+    if(!name) return;
+
+    let phone = prompt("Telefon raqamingiz:");
+    if(!phone) return;
+
+    let address = prompt("Manzilingiz:");
+    if(!address) return;
+
     fetch(API + "/order", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            user_id: user_id
+            user_id: user_id,
+            name: name,
+            phone: phone,
+            address: address
         })
     }).then(() => {
         alert("Buyurtma yuborildi ✅");
         loadCart();
     });
+
 });
 
 
-// 🔥 PAGE LOAD
+// 🔥 LOAD ON START
 loadCart();
 </script>
 
