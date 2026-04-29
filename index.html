@@ -16,6 +16,7 @@ body {margin:0;font-family:sans-serif;background:#f2f2f7;}
 .card-wrap {position:relative;}
 .cart {position:fixed;bottom:0;width:100%;background:white;padding:15px;border-top:1px solid #ddd;}
 .remove {background:red;color:white;border:none;border-radius:8px;padding:4px 8px;margin-left:10px;}
+
 #formScreen {display:none;padding:15px;}
 .form-card {background:white;border-radius:16px;padding:15px;margin-bottom:10px;}
 input {width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;}
@@ -27,28 +28,7 @@ input {width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;}
 
 <div class="header">🍔 Menu</div>
 
-<div class="grid" id="menuGrid">
-<div class="card">
-<div class="card-wrap">
-<img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd">
-<button class="add-btn" onclick="add('Burger')">+</button>
-</div> Burger
-</div>
-
-<div class="card">
-<div class="card-wrap">
-<img src="https://images.unsplash.com/photo-1604908176997-431efae1b1d1">
-<button class="add-btn" onclick="add('Lavash')">+</button>
-</div> Lavash
-</div>
-
-<div class="card">
-<div class="card-wrap">
-<img src="https://images.unsplash.com/photo-1580910051074-3eb694886505">
-<button class="add-btn" onclick="add('Cola')">+</button>
-</div> Cola
-</div>
-</div>
+<div class="grid" id="menuGrid"></div>
 
 <div class="cart" id="cart">Savat bo'sh</div>
 
@@ -78,6 +58,33 @@ tg.expand();
 
 let cart = [];
 let locationData = null;
+
+// 🔥 MENU (BU YERNI O‘ZGARTIRASAN)
+const MENU = [
+    {name:"Burger", price:"25000", img:"https://gratofood.github.io/miniapp/img/burger.jpg"},
+    {name:"Lavash", price:"30000", img:"https://gratofood.github.io/miniapp/img/lavash.jpg"},
+    {name:"Cola", price:"10000", img:"https://gratofood.github.io/miniapp/img/cola.jpg"}
+];
+
+// 🔥 MENU RENDER
+function renderMenu(){
+    const grid = document.getElementById("menuGrid");
+    let html = "";
+
+    MENU.forEach(item=>{
+        html += `
+        <div class="card">
+            <div class="card-wrap">
+                <img src="${item.img}">
+                <button class="add-btn" onclick="add('${item.name}')">+</button>
+            </div>
+            <div style="font-weight:600">${item.name}</div>
+            <div style="color:#666">${item.price} so'm</div>
+        </div>`;
+    });
+
+    grid.innerHTML = html;
+}
 
 // phone only numbers
 document.getElementById("phone")?.addEventListener("input", function(e){
@@ -113,6 +120,7 @@ function renderCart(){
     }
 
     div.innerHTML=html;
+
     tg.MainButton.setText("Buyurtma berish");
     tg.MainButton.show();
 }
@@ -160,6 +168,9 @@ function submitOrder(){
 
     tg.sendData(JSON.stringify(order));
 }
+
+// 🔥 INIT
+renderMenu();
 </script>
 
 </body>
