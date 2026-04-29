@@ -131,122 +131,69 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// 🔴 TELEGRAM USER
-const user_id = tg.initDataUnsafe.user?.id;
-
-// 🔴 SHUNI O'ZGARTIR!
-const API = "https://YOUR-RAILWAY-URL";
-
-
-// ❌ agar Telegram emas bo‘lsa — to‘xtatamiz
-if(!user_id){
-    alert("Iltimos Telegram ichida oching ❌");
+// ❗ faqat Telegram ichida ishlaydi
+if (!tg.initDataUnsafe.user) {
+    document.body.innerHTML = "Telegram ichida oching ❌";
 }
 
+// 🔥 LOCAL CART
+let cart = [];
 
 // ➕ ADD
 function add(item){
-    fetch(API + "/cart/add", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            user_id: user_id,
-            item: item
-        })
-    }).then(loadCart);
+    cart.push(item);
+    renderCart();
 }
-
 
 // ❌ REMOVE
 function removeItem(item){
-    fetch(API + "/cart/remove", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            user_id: user_id,
-            item: item
-        })
-    }).then(loadCart);
+    const index = cart.indexOf(item);
+    if(index > -1){
+        cart.splice(index, 1);
+    }
+    renderCart();
 }
 
+// 🔄 RENDER
+function renderCart(){
+    const div = document.getElementById("cart");
 
-// 🔄 LOAD CART
-function loadCart(){
-    fetch(API + "/cart/" + user_id)
-    .then(res => res.json())
-    .then(cart => {
-
-        const div = document.getElementById("cart");
-
-        if(!cart || cart.length === 0){
-            div.innerHTML = "Savat bo'sh";
-            tg.MainButton.hide();
-            return;
-        }
-
-        let counts = {};
-        cart.forEach(i => counts[i] = (counts[i]||0)+1);
-
-        let html = "";
-
-        for(let item in counts){
-            html += `
-            <div>
-                ${item} x${counts[item]}
-                <button class="remove" onclick="removeItem('${item}')">❌</button>
-            </div>`;
-        }
-
-        div.innerHTML = html;
-
-        tg.MainButton.setText("Buyurtma berish");
-        tg.MainButton.show();
-    });
-}
-
-
-// 🚀 ORDER
-tg.MainButton.onClick(function(){
-
-    if(!user_id){
-        alert("Telegram orqali oching ❌");
+    if(cart.length === 0){
+        div.innerHTML = "Savat bo'sh";
+        tg.MainButton.hide();
         return;
     }
 
-    let name = prompt("Ismingiz:");
-    if(!name) return;
+    let counts = {};
+    cart.forEach(i => counts[i] = (counts[i]||0)+1);
 
-    let phone = prompt("Telefon raqamingiz:");
-    if(!phone) return;
+    let html = "";
 
-    let address = prompt("Manzilingiz:");
-    if(!address) return;
+    for(let item in counts){
+        html += `
+        <div>
+            ${item} x${counts[item]}
+            <button class="remove" onclick="removeItem('${item}')">❌</button>
+        </div>`;
+    }
 
-    fetch(API + "/order", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            user_id: user_id,
-            name: name,
-            phone: phone,
-            address: address
-        })
-    }).then(() => {
-        alert("Buyurtma yuborildi ✅");
-        loadCart();
-    });
+    div.innerHTML = html;
 
+    tg.MainButton.setText("Buyurtma berish");
+    tg.MainButton.show();
+}
+
+// 🚀 ORDER (ENG MUHIM JOY)
+tg.MainButton.onClick(function(){
+
+    if(cart.length === 0){
+        alert("Savat bo'sh ❌");
+        return;
+    }
+
+    tg.sendData(JSON.stringify(cart)); // 🔥 BOTGA YUBORILADI
 });
 
-
-// 🔥 LOAD ON START
-loadCart();
 </script>
 
 </body>
