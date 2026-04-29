@@ -11,11 +11,11 @@
 body {margin:0;font-family:sans-serif;background:#0f0f0f;color:white;}
 h2 {text-align:center;margin:10px 0;}
 
-.search-wrap {display:flex;justify-content:center;padding:0 15px 10px;}
+.search-wrap {padding:10px;}
 #searchInput {width:100%;padding:10px;border-radius:12px;border:1px solid #333;background:#1a1a1a;color:#fff;}
 
 .buttons {display:flex;justify-content:center;gap:10px;margin-bottom:10px;}
-button {padding:10px 15px;border:none;border-radius:20px;background:#222;color:white;cursor:pointer;}
+button {padding:10px;border:none;border-radius:20px;background:#222;color:white;}
 button.active {background:#ef7918;}
 
 .menu {display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;padding:15px;}
@@ -37,18 +37,11 @@ font-size:20px;
 }
 
 .info {position:absolute;bottom:0;width:100%;padding:10px;background:linear-gradient(transparent,rgba(0,0,0,0.9));}
-.info h3 {margin:0;font-size:16px;}
+.info h3 {margin:0;font-size:15px;}
 .info p {margin:5px 0 0;color:#ef7918;font-weight:bold;}
 
-.cart {
-position:fixed;
-bottom:0;
-width:100%;
-background:black;
-padding:10px;
-}
+.cart {position:fixed;bottom:0;width:100%;background:black;padding:10px;font-size:14px;}
 
-/* FORM */
 #formScreen {display:none;padding:15px;}
 .form-card {background:white;color:black;border-radius:12px;padding:10px;margin-bottom:10px;}
 input {width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;}
@@ -65,32 +58,23 @@ input {width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;}
 </div>
 
 <div class="buttons">
-<button onclick="filter('all', this)" class="active">Hammasi</button>
-<button onclick="filter('first', this)">1-taom</button>
-<button onclick="filter('second', this)">2-taom</button>
-<button onclick="filter('salat', this)">Salat</button>
+<button onclick="filter('all',this)" class="active">Hammasi</button>
+<button onclick="filter('first',this)">1-taom</button>
+<button onclick="filter('second',this)">2-taom</button>
+<button onclick="filter('salat',this)">Salat</button>
 </div>
 
 <div class="menu" id="menu"></div>
-
 <div class="cart" id="cart">Savat bo'sh</div>
 
-<!-- FORM -->
 <div id="formScreen">
-<div class="form-card">
-<input id="name" placeholder="Ismingiz">
-</div>
-
-<div class="form-card">
-<input id="phone" placeholder="901234567" maxlength="9">
-</div>
-
+<div class="form-card"><input id="name" placeholder="Ismingiz"></div>
+<div class="form-card"><input id="phone" placeholder="901234567" maxlength="9"></div>
 <div class="form-card">
 <button onclick="getLocation()">Lokatsiya olish</button>
 <div id="locStatus">Hali olinmadi</div>
 <input id="address" placeholder="Uy, kvartira">
 </div>
-
 <button class="primary-btn" onclick="submitOrder()">Yuborish</button>
 </div>
 
@@ -101,7 +85,6 @@ tg.expand();
 let cart = [];
 let locationData = null;
 
-// 🔥 MENU (SENING RASMLAR)
 const MENU = [
   {
     "type": "first",
@@ -291,26 +274,26 @@ const MENU = [
   }
 ]
 
-// RENDER
 function renderMenu(){
-    const grid=document.getElementById("menu");
+    const grid = document.getElementById("menu");
     grid.innerHTML="";
 
     MENU.forEach(item=>{
-        grid.innerHTML+=`
+        grid.innerHTML += `
         <div class="card ${item.type}">
-        <img src="${item.img}">
-        <button class="add-btn" onclick="add('${item.name}')">+</button>
-        <div class="info">
-        <h3>${item.name}</h3>
-        <p>${item.price} so'm</p>
-        </div>
+            <img src="${item.img}">
+            <button class="add-btn" data-name="${item.name}" onclick="addItem(this)">+</button>
+            <div class="info">
+                <h3>${item.name}</h3>
+                <p>${item.price} so'm</p>
+            </div>
         </div>`;
     });
 }
 
-function add(item){
-    cart.push(item);
+function addItem(btn){
+    const name = btn.getAttribute("data-name");
+    cart.push(name);
     renderCart();
 }
 
@@ -331,12 +314,12 @@ function renderCart(){
 
     document.getElementById("cart").innerText=text;
 
-    tg.MainButton.setText("Buyurtma");
+    tg.MainButton.setText("Buyurtma berish");
     tg.MainButton.show();
 }
 
 tg.MainButton.onClick(()=>{
-document.querySelector(".menu").style.display="none";
+document.getElementById("menu").style.display="none";
 document.getElementById("cart").style.display="none";
 document.getElementById("formScreen").style.display="block";
 tg.MainButton.hide();
@@ -367,7 +350,7 @@ items:cart
 }));
 }
 
-// filter + search
+// filter
 let currentFilter="all";
 const searchInput=document.getElementById("searchInput");
 
