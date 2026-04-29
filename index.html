@@ -28,8 +28,12 @@ button {padding:8px 12px;border:none;border-radius:8px;}
 
 <div id="formScreen">
 <input id="name" placeholder="Ism">
-<input id="phone" placeholder="901234567">
+<input id="phone" placeholder="901234567" maxlength="9" inputmode="numeric">
 <input id="address" placeholder="Manzil">
+
+<button onclick="getLocation()">📍 Lokatsiya olish</button>
+<div id="locStatus">Olinmagan</div>
+
 <button onclick="submitOrder()">Yuborish</button>
 </div>
 
@@ -43,8 +47,9 @@ const tg = window.Telegram.WebApp;
 tg.expand();
 
 let cart = [];
+let locationData = null;
 
-// 🔥 TO‘LIQ MENU (o‘zing to‘liq arrayni shu yerga qo‘y)
+// 🔥 O'ZINGNI TO‘LIQ MENUINGNI SHU YERGA QO‘Y
 const MENU = [
   {
     "type": "first",
@@ -271,7 +276,7 @@ function addItem(btn){
     updateAll();
 }
 
-// + / -
+// +/- 
 function increaseItem(btn){
     const name = btn.getAttribute("data-name");
     const item = cart.find(i => i.name === name);
@@ -359,19 +364,34 @@ function goCheckout(){
     document.getElementById("formScreen").style.display="block";
 }
 
+// 📍 LOCATION
+function getLocation(){
+    navigator.geolocation.getCurrentPosition(pos=>{
+        locationData = {
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude
+        };
+        document.getElementById("locStatus").innerText = "OK";
+    }, ()=>{
+        alert("Lokatsiya ruxsat berilmadi");
+    });
+}
+
 // ORDER
 function submitOrder(){
-    const name=document.getElementById("name").value;
+    const name=document.getElementById("name").value.trim();
     const phone=document.getElementById("phone").value.replace(/\D/g,"");
     const address=document.getElementById("address").value;
 
     if(name.length<2) return alert("Ism xato");
-    if(phone.length!==9) return alert("Telefon 9 ta bo‘lsin");
+    if(phone.length!==9) return alert("Telefon 9 ta raqam bo‘lsin");
+    if(!locationData) return alert("Lokatsiyani oling");
 
     tg.sendData(JSON.stringify({
         name,
         phone,
         address,
+        location: locationData,
         items:cart,
         total:getTotal()
     }));
