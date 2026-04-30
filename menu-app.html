@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Grato Menyu</title>
+<style>
+:root {
+  --orange: #ef7918;
+  --orange-dim: rgba(239,121,24,0.15);
+  --bg: #0f0f0f;
+  --card-bg: #1a1a1a;
+  --border: #2a2a2a;
+  --text: #ffffff;
+  --muted: #888;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family: sans-serif; background: var(--bg); color: var(--text); min-height:100vh; overflow-x:hidden; }
+
+/* ── HEADER ── */
+.header {
+  position: sticky; top:0; z-index:50;
+  background: rgba(15,15,15,0.96);
+  backdrop-filter: blur(12px);
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.header-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.header-logo { width:32px; height:32px; border-radius:50%; object-fit:cover; }
+.header-title { font-size:16px; font-weight:700; color:var(--orange); flex:1; }
+.cart-btn {
+  position:relative; background:var(--orange-dim);
+  border:1px solid var(--orange); border-radius:20px;
+  color:var(--orange); padding:6px 14px; font-size:13px;
+  font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;
+  transition: transform 0.15s;
+}
+.cart-btn.bump { animation: bump 0.3s ease; }
+@keyframes bump { 0%{transform:scale(1)} 40%{transform:scale(1.2)} 100%{transform:scale(1)} }
+.cart-total-badge { font-size:11px; color:var(--muted); }
+
+/* SEARCH */
+.search-wrap { margin-bottom:8px; }
+.search-wrap input {
+  width:100%; padding:8px 12px; border-radius:10px;
+  border:1px solid var(--border); background:#1a1a1a;
+  color:#fff; font-size:14px; outline:none;
+  transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color:var(--orange); }
+
+/* FILTER BUTTONS */
+.filters { display:flex; gap:7px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+.filters::-webkit-scrollbar { display:none; }
+.filter-btn {
+  white-space:nowrap; padding:6px 14px; border-radius:20px;
+  border:1.5px solid var(--border); background:transparent;
+  color:var(--muted); font-size:13px; font-weight:600;
+  cursor:pointer; transition: all 0.2s; flex-shrink:0;
+}
+.filter-btn.active { background:var(--orange); border-color:var(--orange); color:#fff; }
+
+/* ── SCREENS ── */
+.screen { display:none; padding-bottom:80px; }
+.screen.active { display:block; }
+
+/* ── MENU GRID ── */
+.category-label {
+  padding:14px 12px 6px;
+  font-size:12px; font-weight:700;
+  color:var(--orange); letter-spacing:0.06em;
+  text-transform:uppercase;
+}
+.menu-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px,1fr));
+  gap:10px; padding:0 10px 10px;
+}
+
+/* SKELETON */
+.skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+  background-size:200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius:12px; height:200px;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* CARD */
+.card {
+  position:relative; border-radius:12px; overflow:hidden;
+  background:var(--card-bg); cursor:pointer;
+  transition: transform 0.2s;
+}
+.card:active { transform:scale(0.97); }
+.card img { width:100%; height:150px; object-fit:cover; display:block; }
+.card-img-wrap { position:relative; }
+.card-qty-badge {
+  position:absolute; top:6px; left:6px;
+  background:var(--orange); color:#fff;
+  border-radius:20px; padding:2px 8px;
+  font-size:12px; font-weight:700;
+  display:none;
+}
+.card-qty-badge.show { display:block; }
+.add-btn {
+  position:absolute; top:6px; right:6px;
+  background:var(--orange); border:none; border-radius:50%;
+  width:32px; height:32px; color:#fff; font-size:20px; font-weight:300;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition: transform 0.15s, background 0.15s;
+  box-shadow: 0 2px 8px rgba(239,121,24,0.4);
+}
+.add-btn:active { transform:scale(0.85); }
+.add-btn.added { animation: addPop 0.3s ease; }
+@keyframes addPop { 0%{transform:scale(1)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
+.card-info { padding:8px 10px 10px; }
+.card-name { font-size:13px; font-weight:600; line-height:1.3; margin-bottom:4px; }
+.card-price { font-size:13px; color:var(--orange); font-weight:700; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align:center; padding:50px 20px;
+  color:var(--muted); font-size:15px; display:none;
+}
+.empty-state .emoji { font-size:40px; margin-bottom:10px; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7);
+  z-index:200; display:none; align-items:flex-end;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:#181818; border-radius:20px 20px 0 0;
+  width:100%; max-height:85vh; overflow-y:auto;
+  padding:20px; animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-img { width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:14px; }
+.modal-name { font-size:18px; font-weight:700; margin-bottom:6px; }
+.modal-price { font-size:16px; color:var(--orange); font-weight:700; margin-bottom:12px; }
+.modal-desc { font-size:14px; color:var(--muted); margin-bottom:16px; line-height:1.5; }
+.modal-actions { display:flex; align-items:center; gap:12px; }
+.qty-control { display:flex; align-items:center; gap:10px; background:var(--card-bg); border-radius:10px; padding:6px 12px; }
+.qty-btn { background:none; border:none; color:#fff; font-size:22px; cursor:pointer; padding:0 4px; }
+.qty-val { font-size:16px; font-weight:700; min-width:20px; text-align:center; }
+.modal-add-btn {
+  flex:1; background:var(--orange); color:#fff;
+  border:none; border-radius:10px; padding:13px;
+  font-size:15px; font-weight:700; cursor:pointer;
+  transition: opacity 0.2s;
+}
+.modal-add-btn:active { opacity:0.8; }
+.modal-close { position:absolute; top:14px; right:14px; background:#2a2a2a; border:none; color:#fff; border-radius:50%; width:30px; height:30px; font-size:16px; cursor:pointer; }
+
+/* ── CART SCREEN ── */
+.cart-header { padding:14px 12px 0; }
+.cart-header h2 { font-size:18px; font-weight:700; }
+.cart-items { padding:12px; }
+.cart-item {
+  display:flex; align-items:center; gap:10px;
+  background:var(--card-bg); border-radius:12px;
+  padding:10px; margin-bottom:8px;
+  position:relative; overflow:hidden;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.cart-item.removing { transform:translateX(100%); opacity:0; }
+.cart-item-img { width:54px; height:54px; border-radius:8px; object-fit:cover; flex-shrink:0; }
+.cart-item-info { flex:1; min-width:0; }
+.cart-item-name { font-size:13px; font-weight:600; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cart-item-price { font-size:13px; color:var(--orange); font-weight:700; }
+.cart-qty-ctrl { display:flex; align-items:center; gap:8px; }
+.cq-btn { background:#2a2a2a; border:none; color:#fff; border-radius:6px; width:28px; height:28px; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.cq-val { font-size:14px; font-weight:700; min-width:16px; text-align:center; }
+
+.cart-summary { padding:12px; border-top:1px solid var(--border); margin-top:4px; }
+.summary-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:14px; color:var(--muted); }
+.summary-total { font-size:17px; font-weight:700; color:#fff; }
+.summary-total span { color:var(--orange); }
+
+/* PROMO */
+.promo-wrap { display:flex; gap:8px; padding:0 12px 12px; }
+.promo-input {
+  flex:1; padding:9px 12px; border-radius:10px;
+  border:1px solid var(--border); background:#1a1a1a;
+  color:#fff; font-size:14px; outline:none;
+}
+.promo-input:focus { border-color:var(--orange); }
+.promo-btn {
+  background:var(--orange-dim); border:1px solid var(--orange);
+  color:var(--orange); border-radius:10px; padding:9px 14px;
+  font-size:13px; font-weight:600; cursor:pointer;
+}
+.promo-msg { padding:0 12px 8px; font-size:13px; }
+.promo-msg.ok { color:#4cff7a; }
+.promo-msg.err { color:#ff5555; }
+
+.cart-empty { text-align:center; padding:50px 20px; color:var(--muted); }
+.cart-empty .emoji { font-size:48px; margin-bottom:12px; }
+
+/* ── CHECKOUT SCREEN ── */
+.checkout-header { padding:14px 12px 0; display:flex; align-items:center; gap:10px; }
+.back-btn { background:#2a2a2a; border:none; color:#fff; border-radius:8px; padding:7px 10px; cursor:pointer; font-size:14px; }
+.checkout-header h2 { font-size:17px; font-weight:700; }
+.form-wrap { padding:12px; }
+.form-group { margin-bottom:12px; }
+.form-label { font-size:12px; color:var(--muted); margin-bottom:5px; display:block; }
+.form-input {
+  width:100%; padding:11px 13px; border-radius:10px;
+  border:1px solid var(--border); background:#1a1a1a;
+  color:#fff; font-size:15px; outline:none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color:var(--orange); }
+.form-input.err { border-color:#ff5555; }
+.phone-wrap { display:flex; align-items:center; gap:0; }
+.phone-prefix {
+  background:#252525; border:1px solid var(--border);
+  border-right:none; border-radius:10px 0 0 10px;
+  padding:11px 10px; color:var(--muted); font-size:15px;
+}
+.phone-wrap .form-input { border-radius:0 10px 10px 0; }
+.loc-btn {
+  width:100%; padding:11px; border-radius:10px;
+  border:1px solid var(--border); background:#1a1a1a;
+  color:#fff; font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.loc-btn.got { border-color:#4cff7a; background:rgba(76,255,122,0.08); color:#4cff7a; }
+.note-textarea {
+  width:100%; padding:11px 13px; border-radius:10px;
+  border:1px solid var(--border); background:#1a1a1a;
+  color:#fff; font-size:14px; outline:none; resize:none;
+  font-family:sans-serif; transition: border-color 0.2s;
+}
+.note-textarea:focus { border-color:var(--orange); }
+.order-summary-box {
+  background:var(--card-bg); border-radius:12px;
+  padding:12px; margin-bottom:14px;
+}
+.order-summary-box .title { font-size:13px; font-weight:700; color:var(--muted); margin-bottom:8px; }
+.order-summary-item { display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+.order-summary-item span:last-child { color:var(--orange); }
+.order-total-row { display:flex; justify-content:space-between; font-size:15px; font-weight:700; border-top:1px solid var(--border); padding-top:8px; margin-top:8px; }
+.order-total-row span:last-child { color:var(--orange); }
+
+/* OFFLINE BANNER */
+.offline-banner {
+  display:none; position:fixed; top:0; left:0; right:0; z-index:999;
+  background:#ff5555; color:#fff; text-align:center;
+  padding:8px; font-size:13px; font-weight:600;
+}
+.offline-banner.show { display:block; }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:#2a2a2a; color:#fff; padding:10px 20px;
+  border-radius:20px; font-size:13px; font-weight:600;
+  opacity:0; transition: opacity 0.3s, transform 0.3s;
+  z-index:300; white-space:nowrap; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  background:rgba(15,15,15,0.97); border-top:1px solid var(--border);
+  display:flex; justify-content:space-around; padding:10px 0 14px;
+}
+.nav-item {
+  display:flex; flex-direction:column; align-items:center;
+  gap:3px; cursor:pointer; color:var(--muted);
+  font-size:11px; transition:color 0.2s; flex:1;
+}
+.nav-item.active { color:var(--orange); }
+.nav-item .icon { font-size:22px; }
+.nav-item .badge {
+  position:absolute; top:-4px; right:-4px;
+  background:var(--orange); color:#fff;
+  border-radius:10px; padding:1px 5px; font-size:10px;
+  font-weight:700; display:none;
+}
+.nav-item .icon-wrap { position:relative; display:inline-block; }
+.nav-item .badge.show { display:block; }
+</style>
+</head>
+<body>
+
+<!-- OFFLINE BANNER -->
+<div class="offline-banner" id="offlineBanner">📵 Internet aloqasi yo'q</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <img class="modal-img" id="modalImg" src="" alt="">
+    <div class="modal-name" id="modalName"></div>
+    <div class="modal-price" id="modalPrice"></div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="modal-actions">
+      <div class="qty-control">
+        <button class="qty-btn" onclick="modalQtyChange(-1)">−</button>
+        <span class="qty-val" id="modalQty">1</span>
+        <button class="qty-btn" onclick="modalQtyChange(1)">+</button>
+      </div>
+      <button class="modal-add-btn" onclick="addFromModal()">Savatga qo'shish</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <img src="https://gratofood.github.io/gratofood/Grato.png" class="header-logo" alt="Grato">
+    <span class="header-title">Grato Menyu</span>
+    <button class="cart-btn" id="cartBtn" onclick="showCart()">
+      🛒 <span id="cartCount">0</span>
+      <span class="cart-total-badge" id="cartTotalBadge"></span>
+    </button>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="🔍 Taom qidirish...">
+  </div>
+  <div class="filters">
+    <button class="filter-btn active" data-type="all">Hammasi</button>
+    <button class="filter-btn" data-type="first">🍲 1-taom</button>
+    <button class="filter-btn" data-type="second">🍽 2-taom</button>
+    <button class="filter-btn" data-type="salat">🥗 Salatlar</button>
+  </div>
+</div>
+
+<!-- MENU SCREEN -->
+<div class="screen active" id="menuScreen">
+  <div id="menuContainer"></div>
+  <div class="empty-state" id="emptyState">
+    <div class="emoji">😔</div>
+    Hech narsa topilmadi
+  </div>
+</div>
+
+<!-- CART SCREEN -->
+<div class="screen" id="cartScreen">
+  <div class="cart-header"><h2>🛒 Savat</h2></div>
+  <div id="cartContent"></div>
+</div>
+
+<!-- CHECKOUT SCREEN -->
+<div class="screen" id="checkoutScreen">
+  <div class="checkout-header">
+    <button class="back-btn" onclick="showCart()">← Orqaga</button>
+    <h2>Buyurtma berish</h2>
+  </div>
+  <div class="form-wrap">
+    <div class="order-summary-box">
+      <div class="title">BUYURTMA</div>
+      <div id="orderSummaryItems"></div>
+      <div class="order-total-row">
+        <span>Jami:</span>
+        <span id="orderSummaryTotal"></span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Ism *</label>
+      <input class="form-input" id="nameInput" placeholder="Ismingiz" type="text">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telefon *</label>
+      <div class="phone-wrap">
+        <span class="phone-prefix">+998</span>
+        <input class="form-input" id="phoneInput" placeholder="901234567" maxlength="9" inputmode="numeric">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Manzil</label>
+      <input class="form-input" id="addressInput" placeholder="Ko'cha, uy raqami...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Lokatsiya</label>
+      <button class="loc-btn" id="locBtn" onclick="getLocation()">
+        📍 Lokatsiyani olish (ixtiyoriy)
+      </button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Qo'shimcha izoh</label>
+      <textarea class="note-textarea" id="noteInput" rows="3" placeholder="Masalan: kam tuzli, tez keltiring..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="navMenu" onclick="showMenu()">
+    <span class="icon">🍽</span>
+    <span>Menyu</span>
+  </div>
+  <div class="nav-item" id="navCart" onclick="showCart()">
+    <span class="icon-wrap">
+      <span class="icon">🛒</span>
+      <span class="badge" id="navBadge"></span>
+    </span>
+    <span>Savat</span>
+  </div>
+</div>
+
+<script>
+// ── TELEGRAM ──
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.expand();
+  tg.MainButton.setText("Buyurtmani yuborish");
+  tg.MainButton.color = "#ef7918";
+  tg.MainButton.textColor = "#ffffff";
+}
+
+// ── DATA ──
+const MENU = [
+  { type:"first",  name:"Tushonka sho'rva",           price:40000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_1.webp" },
+  { type:"first",  name:"Balaza sho'rva",              price:25000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_2.webp" },
+  { type:"first",  name:"Frikadelki sho'rva",          price:25000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_3.webp" },
+  { type:"first",  name:"Solyanka sho'rva",            price:30000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_5.webp" },
+  { type:"second", name:"Sosiska testa",               price:7000,  img:"https://gratofood.github.io/gratofood/images/optimized_batch2_3.webp" },
+  { type:"second", name:"Go'shtli somsa",              price:7000,  img:"https://gratofood.github.io/gratofood/images/optimized_batch2_4.webp" },
+  { type:"second", name:"Blinchik tvorog&banana",      price:6000,  img:"https://gratofood.github.io/gratofood/images/optimized_batch2_5.webp" },
+  { type:"second", name:"Go'shtli say",                price:45000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_6.webp" },
+  { type:"second", name:"Go'shtli chuchvara",          price:30000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_7.webp" },
+  { type:"second", name:"Turkcha sarmabetti",          price:25000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_8.webp" },
+  { type:"second", name:"Tovuqli say",                 price:40000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_9.webp" },
+  { type:"second", name:"Kotlet go'shtli",             price:15000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_10.webp" },
+  { type:"second", name:"Kotlet pomidor va pishloqli", price:18000, img:"https://gratofood.github.io/gratofood/images/0a68ac5d-39d2-421d-ba33-a57f5152e36f.jpg" },
+  { type:"second", name:"Tuxumbarak",                  price:5000,  img:"https://gratofood.github.io/gratofood/images/440dd845-7b92-4e6c-95b8-28743eb9c8dc.jpg" },
+  { type:"second", name:"Golubsi asorti",              price:30000, img:"https://gratofood.github.io/gratofood/images/51f46064-6c01-4552-823a-5b517f813886.jpg" },
+  { type:"second", name:"Tovuqli kotlet",              price:15000, img:"https://gratofood.github.io/gratofood/images/766bd7e7-283d-447d-800f-0a5f1086452a.jpg" },
+  { type:"second", name:"Tovuq va qo'ziqorinli rulet (kg)", price:100000, img:"https://gratofood.github.io/gratofood/images/94bf73f3-f60e-4aa0-a816-8e395b219659.jpg" },
+  { type:"second", name:"Teriyaki tovuqli",            price:40000, img:"https://gratofood.github.io/gratofood/images/b1e459ba-bb4b-4d63-b470-adee62580cab.jpg" },
+  { type:"second", name:"Tovuq va sabzavotli jiz (kg)",price:80000, img:"https://gratofood.github.io/gratofood/images/e9842175-63b3-4ac1-bc2e-9ba7f774d167.jpg" },
+  { type:"second", name:"Teriyaki go'shtli",           price:45000, img:"https://gratofood.github.io/gratofood/images/ebe4e868-3cd9-433b-8ed9-3db14619bc6e.jpg" },
+  { type:"second", name:"Podjarka",                    price:40000, img:"https://gratofood.github.io/gratofood/images/f24a2df8-9368-43db-b012-731a3cad5dac.jpg" },
+  { type:"second", name:"Qurutoba",                    price:70000, img:"https://gratofood.github.io/gratofood/images/Qurtoba.jpg" },
+  { type:"salat",  name:"Adana salati",                price:40000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Adana.webp" },
+  { type:"salat",  name:"Bahor salati",                price:30000, img:"https://gratofood.github.io/gratofood/images/Salatlar/BahorSalati.webp" },
+  { type:"salat",  name:"Baqlajon rulet",              price:40000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Baklajan rulet.webp" },
+  { type:"salat",  name:"Bavarskiy",                   price:30000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Bavarski.webp" },
+  { type:"salat",  name:"Fransuz salati",              price:30000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Fransuzki.webp" },
+  { type:"salat",  name:"Grato salati",                price:35000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Grato.webp" },
+  { type:"salat",  name:"Qarsildoq Baqlajon",          price:45000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Qarsildoq baqlajan.webp" },
+  { type:"salat",  name:"Seul",                        price:35000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Seul.webp" },
+  { type:"salat",  name:"Vinegret",                    price:20000, img:"https://gratofood.github.io/gratofood/images/Salatlar/vinegret.webp" },
+];
+
+const PROMO_CODES = { "GRATO10": 10, "GRATO20": 20 };
+const CATEGORY_LABELS = { first:"🍲 1-taom – Sho'rvalar", second:"🍽 2-taom – Asosiy taomlar", salat:"🥗 Salatlar" };
+
+
+// ── STATE ──
+let cart = JSON.parse(localStorage.getItem("grCart") || "[]");
+let currentFilter = "all";
+let currentSearch = "";
+let locationData = null;
+let modalItem = null;
+let modalQtyVal = 1;
+let promoDiscount = 0;
+let promoApplied = "";
+
+// ── UTILS ──
+const fmt = n => n.toLocaleString("uz") + " so'm";
+
+function saveCart() {
+  localStorage.setItem("grCart", JSON.stringify(cart));
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+function haptic(type = "light") {
+  tg?.HapticFeedback?.impactOccurred(type);
+}
+
+// ── OFFLINE ──
+window.addEventListener("online",  () => document.getElementById("offlineBanner").classList.remove("show"));
+window.addEventListener("offline", () => document.getElementById("offlineBanner").classList.add("show"));
+if (!navigator.onLine) document.getElementById("offlineBanner").classList.add("show");
+
+// ── RENDER MENU ──
+function renderMenu() {
+  const container = document.getElementById("menuContainer");
+  const query = currentSearch.toLowerCase();
+
+  const groups = { first:[], second:[], salat:[] };
+
+  MENU.forEach(item => {
+    const matchCat  = currentFilter === "all" || item.type === currentFilter;
+    const matchSrch = !query || item.name.toLowerCase().includes(query);
+    if (matchCat && matchSrch) groups[item.type].push(item);
+  });
+
+  const total = Object.values(groups).reduce((s, g) => s + g.length, 0);
+  document.getElementById("emptyState").style.display = total === 0 ? "block" : "none";
+
+  let html = "";
+  ["first","second","salat"].forEach(type => {
+    if (!groups[type].length) return;
+    if (currentFilter === "all" && !query) {
+      html += `<div class="category-label">${CATEGORY_LABELS[type]}</div>`;
+    }
+    html += `<div class="menu-grid">`;
+    groups[type].forEach(item => {
+      const cartItem = cart.find(c => c.name === item.name);
+      const qty = cartItem ? cartItem.qty : 0;
+      html += `
+        <div class="card" onclick="openModal('${item.name.replace(/'/g,"\\'")}')">
+          <div class="card-img-wrap">
+            <img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.src='https://gratofood.github.io/gratofood/Grato.png'">
+            <span class="card-qty-badge ${qty > 0 ? 'show' : ''}" id="badge-${CSS.escape(item.name)}">${qty}x</span>
+            <button class="add-btn" id="addbtn-${CSS.escape(item.name)}"
+              onclick="event.stopPropagation(); quickAdd('${item.name.replace(/'/g,"\\'")}')">+</button>
+          </div>
+          <div class="card-info">
+            <div class="card-name">${item.name}</div>
+            <div class="card-price">${fmt(item.price)}</div>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ── QUICK ADD ──
+function quickAdd(name) {
+  haptic("light");
+  const item = MENU.find(i => i.name === name);
+  const found = cart.find(c => c.name === name);
+  if (found) found.qty++;
+  else cart.push({ name, price: item.price, img: item.img, qty: 1 });
+  saveCart();
+  updateCartUI();
+  updateCardBadge(name);
+
+  const btn = document.getElementById("addbtn-" + CSS.escape(name));
+  if (btn) { btn.classList.add("added"); setTimeout(() => btn.classList.remove("added"), 300); }
+
+  showToast("✅ Savatga qo'shildi");
+}
+
+function updateCardBadge(name) {
+  const item = cart.find(c => c.name === name);
+  const qty = item ? item.qty : 0;
+  const badge = document.getElementById("badge-" + CSS.escape(name));
+  if (badge) {
+    badge.textContent = qty + "x";
+    badge.classList.toggle("show", qty > 0);
+  }
+}
+
+// ── MODAL ──
+function openModal(name) {
+  haptic("light");
+  modalItem = MENU.find(i => i.name === name);
+  if (!modalItem) return;
+  const cartItem = cart.find(c => c.name === name);
+  modalQtyVal = cartItem ? cartItem.qty : 1;
+
+  document.getElementById("modalImg").src = modalItem.img;
+  document.getElementById("modalName").textContent = modalItem.name;
+  document.getElementById("modalPrice").textContent = fmt(modalItem.price);
+  document.getElementById("modalDesc").textContent = "Tarkibi va tavsifi tez orada qo'shiladi.";
+  document.getElementById("modalQty").textContent = modalQtyVal;
+  document.getElementById("modalOverlay").classList.add("open");
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById("modalOverlay")) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  modalItem = null;
+}
+
+function modalQtyChange(delta) {
+  modalQtyVal = Math.max(1, modalQtyVal + delta);
+  document.getElementById("modalQty").textContent = modalQtyVal;
+}
+
+function addFromModal() {
+  if (!modalItem) return;
+  haptic("medium");
+  const found = cart.find(c => c.name === modalItem.name);
+  if (found) found.qty = modalQtyVal;
+  else cart.push({ name: modalItem.name, price: modalItem.price, img: modalItem.img, qty: modalQtyVal });
+  saveCart();
+  updateCartUI();
+  updateCardBadge(modalItem.name);
+  closeModalBtn();
+  showToast("✅ Savatga qo'shildi");
+}
+
+// ── CART UI ──
+function updateCartUI() {
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById("cartCount").textContent = count;
+  document.getElementById("navBadge").textContent = count;
+  document.getElementById("navBadge").classList.toggle("show", count > 0);
+
+  const total = getTotal();
+  document.getElementById("cartTotalBadge").textContent = total > 0 ? fmt(total) : "";
+
+  const cartBtn = document.getElementById("cartBtn");
+  cartBtn.classList.add("bump");
+  setTimeout(() => cartBtn.classList.remove("bump"), 300);
+
+  // MainButton
+  if (tg?.MainButton) {
+    if (count > 0 && document.getElementById("checkoutScreen").classList.contains("active")) {
+      tg.MainButton.show();
+    } else {
+      tg.MainButton.hide();
+    }
+  }
+}
+
+function getTotal() {
+  const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  return promoDiscount > 0 ? Math.round(sub * (1 - promoDiscount / 100)) : sub;
+}
+
+function getSubtotal() {
+  return cart.reduce((s, i) => s + i.price * i.qty, 0);
+}
+
+// ── CART SCREEN ──
+function renderCartScreen() {
+  const div = document.getElementById("cartContent");
+  if (cart.length === 0) {
+    div.innerHTML = `<div class="cart-empty"><div class="emoji">🛒</div>Savat bo'sh</div>`;
+    return;
+  }
+
+  let itemsHtml = `<div class="cart-items">`;
+  cart.forEach(item => {
+    itemsHtml += `
+      <div class="cart-item" id="ci-${CSS.escape(item.name)}">
+        <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.src='https://gratofood.github.io/gratofood/Grato.png'">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">${fmt(item.price * item.qty)}</div>
+        </div>
+        <div class="cart-qty-ctrl">
+          <button class="cq-btn" onclick="cartChange('${item.name.replace(/'/g,"\\'")}', -1)">−</button>
+          <span class="cq-val">${item.qty}</span>
+          <button class="cq-btn" onclick="cartChange('${item.name.replace(/'/g,"\\'")}', 1)">+</button>
+        </div>
+      </div>`;
+  });
+  itemsHtml += `</div>`;
+
+  const sub = getSubtotal();
+  const disc = promoDiscount > 0 ? Math.round(sub * promoDiscount / 100) : 0;
+  const total = getTotal();
+
+  const summaryHtml = `
+    <div class="cart-summary">
+      <div class="summary-row"><span>Mahsulotlar</span><span>${fmt(sub)}</span></div>
+      ${disc > 0 ? `<div class="summary-row"><span>Chegirma (${promoDiscount}%)</span><span style="color:#4cff7a">−${fmt(disc)}</span></div>` : ""}
+      <div class="summary-row summary-total"><span>Jami:</span><span><span>${fmt(total)}</span></span></div>
+    </div>`;
+
+  const promoHtml = `
+    <div class="promo-wrap">
+      <input class="promo-input" id="promoInput" placeholder="Promo-kod" value="${promoApplied}">
+      <button class="promo-btn" onclick="applyPromo()">Qo'llash</button>
+    </div>
+    <div class="promo-msg" id="promoMsg"></div>`;
+
+  const checkoutBtn = `<div style="padding:0 12px 12px"><button onclick="showCheckout()" style="width:100%;background:#ef7918;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;">Buyurtma berish →</button></div>`;
+
+  div.innerHTML = itemsHtml + summaryHtml + promoHtml + checkoutBtn;
+}
+
+function cartChange(name, delta) {
+  haptic("light");
+  const idx = cart.findIndex(c => c.name === name);
+  if (idx === -1) return;
+
+  if (delta === -1 && cart[idx].qty === 1) {
+    const el = document.getElementById("ci-" + CSS.escape(name));
+    if (el) {
+      el.classList.add("removing");
+      setTimeout(() => {
+        cart.splice(idx, 1);
+        saveCart(); updateCartUI(); renderCartScreen(); updateCardBadge(name);
+      }, 280);
+      return;
+    }
+  }
+
+  cart[idx].qty = Math.max(0, cart[idx].qty + delta);
+  if (cart[idx].qty === 0) cart.splice(idx, 1);
+  saveCart(); updateCartUI(); renderCartScreen(); updateCardBadge(name);
+}
+
+// ── PROMO ──
+function applyPromo() {
+  const code = document.getElementById("promoInput")?.value.trim().toUpperCase();
+  const msg = document.getElementById("promoMsg");
+  if (!code) return;
+
+  if (PROMO_CODES[code]) {
+    promoDiscount = PROMO_CODES[code];
+    promoApplied = code;
+    msg.className = "promo-msg ok";
+    msg.textContent = `✅ ${promoDiscount}% chegirma qo'llandi!`;
+    haptic("medium");
+  } else {
+    promoDiscount = 0;
+    promoApplied = "";
+    msg.className = "promo-msg err";
+    msg.textContent = "❌ Promo-kod noto'g'ri";
+  }
+  renderCartScreen();
+}
+
+// ── LOCATION ──
+function getLocation() {
+  const btn = document.getElementById("locBtn");
+  btn.textContent = "⏳ Aniqlanmoqda...";
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      locationData = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+      btn.textContent = "✅ Lokatsiya olindi";
+      btn.classList.add("got");
+      haptic("medium");
+    },
+    () => {
+      btn.textContent = "📍 Lokatsiyani olish (ixtiyoriy)";
+      showToast("Lokatsiya ruxsat berilmadi");
+    }
+  );
+}
+
+// ── CHECKOUT ──
+function renderCheckout() {
+  const items = document.getElementById("orderSummaryItems");
+  items.innerHTML = cart.map(i =>
+    `<div class="order-summary-item"><span>${i.name} x${i.qty}</span><span>${fmt(i.price * i.qty)}</span></div>`
+  ).join("");
+  document.getElementById("orderSummaryTotal").textContent = fmt(getTotal());
+}
+
+function submitOrder() {
+  const name = document.getElementById("nameInput").value.trim();
+  const phone = document.getElementById("phoneInput").value.replace(/\D/g, "");
+  const address = document.getElementById("addressInput").value.trim();
+  const note = document.getElementById("noteInput").value.trim();
+
+  document.getElementById("nameInput").classList.remove("err");
+  document.getElementById("phoneInput").classList.remove("err");
+
+  if (name.length < 2) {
+    document.getElementById("nameInput").classList.add("err");
+    showToast("❌ Ism kamida 2 harf bo'lsin");
+    return;
+  }
+  if (phone.length !== 9) {
+    document.getElementById("phoneInput").classList.add("err");
+    showToast("❌ Telefon 9 ta raqam bo'lsin");
+    return;
+  }
+
+  haptic("heavy");
+
+  tg?.sendData(JSON.stringify({
+    name, phone: "+998" + phone, address, note,
+    location: locationData,
+    items: cart,
+    subtotal: getSubtotal(),
+    promo: promoApplied || null,
+    discount: promoDiscount,
+    total: getTotal()
+  }));
+
+  cart = []; saveCart(); updateCartUI();
+  showToast("🎉 Buyurtma yuborildi!");
+  showMenu();
+}
+
+// ── TELEGRAM MAIN BUTTON ──
+if (tg?.MainButton) {
+  tg.MainButton.onClick(submitOrder);
+}
+
+// ── NAVIGATION ──
+function showMenu() {
+  setScreen("menuScreen");
+  setNav("navMenu");
+  tg?.MainButton?.hide();
+}
+
+function showCart() {
+  setScreen("cartScreen");
+  setNav("navCart");
+  renderCartScreen();
+  tg?.MainButton?.hide();
+}
+
+function showCheckout() {
+  if (cart.length === 0) { showToast("Savat bo'sh"); return; }
+  setScreen("checkoutScreen");
+  renderCheckout();
+  if (tg?.MainButton) {
+    tg.MainButton.setText(`Yuborish • ${fmt(getTotal())}`);
+    tg.MainButton.show();
+  }
+}
+
+function setScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function setNav(id) {
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// ── FILTERS & SEARCH ──
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.type;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    haptic("light");
+    renderMenu();
+  });
+});
+
+document.getElementById("searchInput").addEventListener("input", e => {
+  currentSearch = e.target.value;
+  renderMenu();
+});
+
+// ── INIT ──
+renderMenu();
+updateCartUI();
+</script>
+</body>
+</html>
