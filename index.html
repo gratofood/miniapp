@@ -18,7 +18,6 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { font-family: sans-serif; background: var(--bg); color: var(--text); min-height:100vh; overflow-x:hidden; }
 
-/* ── HEADER ── */
 .header {
   position: sticky; top:0; z-index:50;
   background: rgba(15,15,15,0.96);
@@ -40,7 +39,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 @keyframes bump { 0%{transform:scale(1)} 40%{transform:scale(1.2)} 100%{transform:scale(1)} }
 .cart-total-badge { font-size:11px; color:var(--muted); }
 
-/* SEARCH */
 .search-wrap { margin-bottom:8px; }
 .search-wrap input {
   width:100%; padding:8px 12px; border-radius:10px;
@@ -50,7 +48,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 }
 .search-wrap input:focus { border-color:var(--orange); }
 
-/* FILTER BUTTONS */
 .filters { display:flex; gap:7px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
 .filters::-webkit-scrollbar { display:none; }
 .filter-btn {
@@ -61,11 +58,9 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 }
 .filter-btn.active { background:var(--orange); border-color:var(--orange); color:#fff; }
 
-/* ── SCREENS ── */
 .screen { display:none; padding-bottom:80px; }
 .screen.active { display:block; }
 
-/* ── MENU GRID ── */
 .category-label {
   padding:14px 12px 6px;
   font-size:12px; font-weight:700;
@@ -78,7 +73,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
   gap:10px; padding:0 10px 10px;
 }
 
-/* SKELETON */
 .skeleton {
   background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
   background-size:200% 100%;
@@ -87,7 +81,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 }
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-/* CARD */
 .card {
   position:relative; border-radius:12px; overflow:hidden;
   background:var(--card-bg); cursor:pointer;
@@ -119,14 +112,12 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 .card-name { font-size:13px; font-weight:600; line-height:1.3; margin-bottom:4px; }
 .card-price { font-size:13px; color:var(--orange); font-weight:700; }
 
-/* EMPTY STATE */
 .empty-state {
   text-align:center; padding:50px 20px;
   color:var(--muted); font-size:15px; display:none;
 }
 .empty-state .emoji { font-size:40px; margin-bottom:10px; }
 
-/* ── MODAL ── */
 .modal-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.7);
   z-index:200; display:none; align-items:flex-end;
@@ -155,7 +146,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 .modal-add-btn:active { opacity:0.8; }
 .modal-close { position:absolute; top:14px; right:14px; background:#2a2a2a; border:none; color:#fff; border-radius:50%; width:30px; height:30px; font-size:16px; cursor:pointer; }
 
-/* ── CART SCREEN ── */
 .cart-header { padding:14px 12px 0; }
 .cart-header h2 { font-size:18px; font-weight:700; }
 .cart-items { padding:12px; }
@@ -180,7 +170,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 .summary-total { font-size:17px; font-weight:700; color:#fff; }
 .summary-total span { color:var(--orange); }
 
-/* PROMO */
 .promo-wrap { display:flex; gap:8px; padding:0 12px 12px; }
 .promo-input {
   flex:1; padding:9px 12px; border-radius:10px;
@@ -200,7 +189,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 .cart-empty { text-align:center; padding:50px 20px; color:var(--muted); }
 .cart-empty .emoji { font-size:48px; margin-bottom:12px; }
 
-/* ── CHECKOUT SCREEN ── */
 .checkout-header { padding:14px 12px 0; display:flex; align-items:center; gap:10px; }
 .back-btn { background:#2a2a2a; border:none; color:#fff; border-radius:8px; padding:7px 10px; cursor:pointer; font-size:14px; }
 .checkout-header h2 { font-size:17px; font-weight:700; }
@@ -230,6 +218,11 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
   transition: border-color 0.2s, background 0.2s;
 }
 .loc-btn.got { border-color:#4cff7a; background:rgba(76,255,122,0.08); color:#4cff7a; }
+.loc-coords {
+  margin-top:6px; font-size:12px; color:#888; display:none;
+  padding:8px 10px; background:#1a1a1a; border-radius:8px;
+}
+.loc-coords a { color:var(--orange); text-decoration:none; }
 .note-textarea {
   width:100%; padding:11px 13px; border-radius:10px;
   border:1px solid var(--border); background:#1a1a1a;
@@ -247,7 +240,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 .order-total-row { display:flex; justify-content:space-between; font-size:15px; font-weight:700; border-top:1px solid var(--border); padding-top:8px; margin-top:8px; }
 .order-total-row span:last-child { color:var(--orange); }
 
-/* OFFLINE BANNER */
 .offline-banner {
   display:none; position:fixed; top:0; left:0; right:0; z-index:999;
   background:#ff5555; color:#fff; text-align:center;
@@ -255,7 +247,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 }
 .offline-banner.show { display:block; }
 
-/* TOAST */
 .toast {
   position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
   background:#2a2a2a; color:#fff; padding:10px 20px;
@@ -265,7 +256,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* BOTTOM NAV */
 .bottom-nav {
   position:fixed; bottom:0; left:0; right:0; z-index:100;
   background:rgba(15,15,15,0.97); border-top:1px solid var(--border);
@@ -290,10 +280,7 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 </head>
 <body>
 
-<!-- OFFLINE BANNER -->
 <div class="offline-banner" id="offlineBanner">📵 Internet aloqasi yo'q</div>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <!-- MODAL -->
@@ -383,10 +370,14 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
       <input class="form-input" id="addressInput" placeholder="Ko'cha, uy raqami...">
     </div>
     <div class="form-group">
-      <label class="form-label">Lokatsiya</label>
+      <label class="form-label">Lokatsiya (ixtiyoriy)</label>
       <button class="loc-btn" id="locBtn" onclick="getLocation()">
-        📍 Lokatsiyani olish (ixtiyoriy)
+        📍 Lokatsiyani olish
       </button>
+      <div class="loc-coords" id="locCoords">
+        📍 <span id="locLat"></span>,<span id="locLon"></span><br>
+        🗺 <a id="locLink" href="" target="_blank">Google Maps da ko'rish</a>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Qo'shimcha izoh</label>
@@ -411,7 +402,6 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 </div>
 
 <script>
-// ── TELEGRAM ──
 const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.expand();
@@ -420,7 +410,6 @@ if (tg) {
   tg.MainButton.textColor = "#ffffff";
 }
 
-// ── DATA ──
 const MENU = [
   { type:"first",  name:"Tushonka sho'rva",           price:40000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_1.webp" },
   { type:"first",  name:"Balaza sho'rva",              price:25000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_2.webp" },
@@ -458,8 +447,6 @@ const MENU = [
 const PROMO_CODES = { "GRATO10": 10, "GRATO20": 20 };
 const CATEGORY_LABELS = { first:"🍲 1-taom – Sho'rvalar", second:"🍽 2-taom – Asosiy taomlar", salat:"🥗 Salatlar" };
 
-
-// ── STATE ──
 let cart = JSON.parse(localStorage.getItem("grCart") || "[]");
 let currentFilter = "all";
 let currentSearch = "";
@@ -469,12 +456,9 @@ let modalQtyVal = 1;
 let promoDiscount = 0;
 let promoApplied = "";
 
-// ── UTILS ──
 const fmt = n => n.toLocaleString("uz") + " so'm";
 
-function saveCart() {
-  localStorage.setItem("grCart", JSON.stringify(cart));
-}
+function saveCart() { localStorage.setItem("grCart", JSON.stringify(cart)); }
 
 function showToast(msg) {
   const t = document.getElementById("toast");
@@ -484,37 +468,27 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove("show"), 2000);
 }
 
-function haptic(type = "light") {
-  tg?.HapticFeedback?.impactOccurred(type);
-}
+function haptic(type = "light") { tg?.HapticFeedback?.impactOccurred(type); }
 
-// ── OFFLINE ──
 window.addEventListener("online",  () => document.getElementById("offlineBanner").classList.remove("show"));
 window.addEventListener("offline", () => document.getElementById("offlineBanner").classList.add("show"));
 if (!navigator.onLine) document.getElementById("offlineBanner").classList.add("show");
 
-// ── RENDER MENU ──
 function renderMenu() {
   const container = document.getElementById("menuContainer");
   const query = currentSearch.toLowerCase();
-
   const groups = { first:[], second:[], salat:[] };
-
   MENU.forEach(item => {
     const matchCat  = currentFilter === "all" || item.type === currentFilter;
     const matchSrch = !query || item.name.toLowerCase().includes(query);
     if (matchCat && matchSrch) groups[item.type].push(item);
   });
-
   const total = Object.values(groups).reduce((s, g) => s + g.length, 0);
   document.getElementById("emptyState").style.display = total === 0 ? "block" : "none";
-
   let html = "";
   ["first","second","salat"].forEach(type => {
     if (!groups[type].length) return;
-    if (currentFilter === "all" && !query) {
-      html += `<div class="category-label">${CATEGORY_LABELS[type]}</div>`;
-    }
+    if (currentFilter === "all" && !query) html += `<div class="category-label">${CATEGORY_LABELS[type]}</div>`;
     html += `<div class="menu-grid">`;
     groups[type].forEach(item => {
       const cartItem = cart.find(c => c.name === item.name);
@@ -535,24 +509,18 @@ function renderMenu() {
     });
     html += `</div>`;
   });
-
   container.innerHTML = html;
 }
 
-// ── QUICK ADD ──
 function quickAdd(name) {
   haptic("light");
   const item = MENU.find(i => i.name === name);
   const found = cart.find(c => c.name === name);
   if (found) found.qty++;
   else cart.push({ name, price: item.price, img: item.img, qty: 1 });
-  saveCart();
-  updateCartUI();
-  updateCardBadge(name);
-
+  saveCart(); updateCartUI(); updateCardBadge(name);
   const btn = document.getElementById("addbtn-" + CSS.escape(name));
   if (btn) { btn.classList.add("added"); setTimeout(() => btn.classList.remove("added"), 300); }
-
   showToast("✅ Savatga qo'shildi");
 }
 
@@ -560,20 +528,15 @@ function updateCardBadge(name) {
   const item = cart.find(c => c.name === name);
   const qty = item ? item.qty : 0;
   const badge = document.getElementById("badge-" + CSS.escape(name));
-  if (badge) {
-    badge.textContent = qty + "x";
-    badge.classList.toggle("show", qty > 0);
-  }
+  if (badge) { badge.textContent = qty + "x"; badge.classList.toggle("show", qty > 0); }
 }
 
-// ── MODAL ──
 function openModal(name) {
   haptic("light");
   modalItem = MENU.find(i => i.name === name);
   if (!modalItem) return;
   const cartItem = cart.find(c => c.name === name);
   modalQtyVal = cartItem ? cartItem.qty : 1;
-
   document.getElementById("modalImg").src = modalItem.img;
   document.getElementById("modalName").textContent = modalItem.name;
   document.getElementById("modalPrice").textContent = fmt(modalItem.price);
@@ -582,13 +545,8 @@ function openModal(name) {
   document.getElementById("modalOverlay").classList.add("open");
 }
 
-function closeModal(e) {
-  if (e.target === document.getElementById("modalOverlay")) closeModalBtn();
-}
-function closeModalBtn() {
-  document.getElementById("modalOverlay").classList.remove("open");
-  modalItem = null;
-}
+function closeModal(e) { if (e.target === document.getElementById("modalOverlay")) closeModalBtn(); }
+function closeModalBtn() { document.getElementById("modalOverlay").classList.remove("open"); modalItem = null; }
 
 function modalQtyChange(delta) {
   modalQtyVal = Math.max(1, modalQtyVal + delta);
@@ -601,34 +559,24 @@ function addFromModal() {
   const found = cart.find(c => c.name === modalItem.name);
   if (found) found.qty = modalQtyVal;
   else cart.push({ name: modalItem.name, price: modalItem.price, img: modalItem.img, qty: modalQtyVal });
-  saveCart();
-  updateCartUI();
-  updateCardBadge(modalItem.name);
-  closeModalBtn();
+  saveCart(); updateCartUI(); updateCardBadge(modalItem.name); closeModalBtn();
   showToast("✅ Savatga qo'shildi");
 }
 
-// ── CART UI ──
 function updateCartUI() {
   const count = cart.reduce((s, i) => s + i.qty, 0);
   document.getElementById("cartCount").textContent = count;
   document.getElementById("navBadge").textContent = count;
   document.getElementById("navBadge").classList.toggle("show", count > 0);
-
   const total = getTotal();
   document.getElementById("cartTotalBadge").textContent = total > 0 ? fmt(total) : "";
-
   const cartBtn = document.getElementById("cartBtn");
   cartBtn.classList.add("bump");
   setTimeout(() => cartBtn.classList.remove("bump"), 300);
-
-  // MainButton
   if (tg?.MainButton) {
     if (count > 0 && document.getElementById("checkoutScreen").classList.contains("active")) {
       tg.MainButton.show();
-    } else {
-      tg.MainButton.hide();
-    }
+    } else { tg.MainButton.hide(); }
   }
 }
 
@@ -637,18 +585,14 @@ function getTotal() {
   return promoDiscount > 0 ? Math.round(sub * (1 - promoDiscount / 100)) : sub;
 }
 
-function getSubtotal() {
-  return cart.reduce((s, i) => s + i.price * i.qty, 0);
-}
+function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
 
-// ── CART SCREEN ──
 function renderCartScreen() {
   const div = document.getElementById("cartContent");
   if (cart.length === 0) {
     div.innerHTML = `<div class="cart-empty"><div class="emoji">🛒</div>Savat bo'sh</div>`;
     return;
   }
-
   let itemsHtml = `<div class="cart-items">`;
   cart.forEach(item => {
     itemsHtml += `
@@ -666,27 +610,22 @@ function renderCartScreen() {
       </div>`;
   });
   itemsHtml += `</div>`;
-
   const sub = getSubtotal();
   const disc = promoDiscount > 0 ? Math.round(sub * promoDiscount / 100) : 0;
   const total = getTotal();
-
   const summaryHtml = `
     <div class="cart-summary">
       <div class="summary-row"><span>Mahsulotlar</span><span>${fmt(sub)}</span></div>
       ${disc > 0 ? `<div class="summary-row"><span>Chegirma (${promoDiscount}%)</span><span style="color:#4cff7a">−${fmt(disc)}</span></div>` : ""}
       <div class="summary-row summary-total"><span>Jami:</span><span><span>${fmt(total)}</span></span></div>
     </div>`;
-
   const promoHtml = `
     <div class="promo-wrap">
       <input class="promo-input" id="promoInput" placeholder="Promo-kod" value="${promoApplied}">
       <button class="promo-btn" onclick="applyPromo()">Qo'llash</button>
     </div>
     <div class="promo-msg" id="promoMsg"></div>`;
-
   const checkoutBtn = `<div style="padding:0 12px 12px"><button onclick="showCheckout()" style="width:100%;background:#ef7918;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;">Buyurtma berish →</button></div>`;
-
   div.innerHTML = itemsHtml + summaryHtml + promoHtml + checkoutBtn;
 }
 
@@ -694,46 +633,36 @@ function cartChange(name, delta) {
   haptic("light");
   const idx = cart.findIndex(c => c.name === name);
   if (idx === -1) return;
-
   if (delta === -1 && cart[idx].qty === 1) {
     const el = document.getElementById("ci-" + CSS.escape(name));
     if (el) {
       el.classList.add("removing");
-      setTimeout(() => {
-        cart.splice(idx, 1);
-        saveCart(); updateCartUI(); renderCartScreen(); updateCardBadge(name);
-      }, 280);
+      setTimeout(() => { cart.splice(idx, 1); saveCart(); updateCartUI(); renderCartScreen(); updateCardBadge(name); }, 280);
       return;
     }
   }
-
   cart[idx].qty = Math.max(0, cart[idx].qty + delta);
   if (cart[idx].qty === 0) cart.splice(idx, 1);
   saveCart(); updateCartUI(); renderCartScreen(); updateCardBadge(name);
 }
 
-// ── PROMO ──
 function applyPromo() {
   const code = document.getElementById("promoInput")?.value.trim().toUpperCase();
   const msg = document.getElementById("promoMsg");
   if (!code) return;
-
   if (PROMO_CODES[code]) {
-    promoDiscount = PROMO_CODES[code];
-    promoApplied = code;
+    promoDiscount = PROMO_CODES[code]; promoApplied = code;
     msg.className = "promo-msg ok";
     msg.textContent = `✅ ${promoDiscount}% chegirma qo'llandi!`;
     haptic("medium");
   } else {
-    promoDiscount = 0;
-    promoApplied = "";
+    promoDiscount = 0; promoApplied = "";
     msg.className = "promo-msg err";
     msg.textContent = "❌ Promo-kod noto'g'ri";
   }
   renderCartScreen();
 }
 
-// ── LOCATION ──
 function getLocation() {
   const btn = document.getElementById("locBtn");
   btn.textContent = "⏳ Aniqlanmoqda...";
@@ -743,15 +672,18 @@ function getLocation() {
       btn.textContent = "✅ Lokatsiya olindi";
       btn.classList.add("got");
       haptic("medium");
+      document.getElementById("locLat").textContent = locationData.lat.toFixed(5);
+      document.getElementById("locLon").textContent = locationData.lon.toFixed(5);
+      document.getElementById("locLink").href = `https://maps.google.com/?q=${locationData.lat},${locationData.lon}`;
+      document.getElementById("locCoords").style.display = "block";
     },
     () => {
-      btn.textContent = "📍 Lokatsiyani olish (ixtiyoriy)";
+      btn.textContent = "📍 Lokatsiyani olish";
       showToast("Lokatsiya ruxsat berilmadi");
     }
   );
 }
 
-// ── CHECKOUT ──
 function renderCheckout() {
   const items = document.getElementById("orderSummaryItems");
   items.innerHTML = cart.map(i =>
@@ -765,23 +697,17 @@ function submitOrder() {
   const phone = document.getElementById("phoneInput").value.replace(/\D/g, "");
   const address = document.getElementById("addressInput").value.trim();
   const note = document.getElementById("noteInput").value.trim();
-
   document.getElementById("nameInput").classList.remove("err");
   document.getElementById("phoneInput").classList.remove("err");
-
   if (name.length < 2) {
     document.getElementById("nameInput").classList.add("err");
-    showToast("❌ Ism kamida 2 harf bo'lsin");
-    return;
+    showToast("❌ Ism kamida 2 harf bo'lsin"); return;
   }
   if (phone.length !== 9) {
     document.getElementById("phoneInput").classList.add("err");
-    showToast("❌ Telefon 9 ta raqam bo'lsin");
-    return;
+    showToast("❌ Telefon 9 ta raqam bo'lsin"); return;
   }
-
   haptic("heavy");
-
   tg?.sendData(JSON.stringify({
     name, phone: "+998" + phone, address, note,
     location: locationData,
@@ -791,68 +717,33 @@ function submitOrder() {
     discount: promoDiscount,
     total: getTotal()
   }));
-
   cart = []; saveCart(); updateCartUI();
   showToast("🎉 Buyurtma yuborildi!");
   showMenu();
 }
 
-// ── TELEGRAM MAIN BUTTON ──
-if (tg?.MainButton) {
-  tg.MainButton.onClick(submitOrder);
-}
+if (tg?.MainButton) { tg.MainButton.onClick(submitOrder); }
 
-// ── NAVIGATION ──
-function showMenu() {
-  setScreen("menuScreen");
-  setNav("navMenu");
-  tg?.MainButton?.hide();
-}
-
-function showCart() {
-  setScreen("cartScreen");
-  setNav("navCart");
-  renderCartScreen();
-  tg?.MainButton?.hide();
-}
-
+function showMenu() { setScreen("menuScreen"); setNav("navMenu"); tg?.MainButton?.hide(); }
+function showCart() { setScreen("cartScreen"); setNav("navCart"); renderCartScreen(); tg?.MainButton?.hide(); }
 function showCheckout() {
   if (cart.length === 0) { showToast("Savat bo'sh"); return; }
-  setScreen("checkoutScreen");
-  renderCheckout();
-  if (tg?.MainButton) {
-    tg.MainButton.setText(`Yuborish • ${fmt(getTotal())}`);
-    tg.MainButton.show();
-  }
+  setScreen("checkoutScreen"); renderCheckout();
+  if (tg?.MainButton) { tg.MainButton.setText(`Yuborish • ${fmt(getTotal())}`); tg.MainButton.show(); }
 }
+function setScreen(id) { document.querySelectorAll(".screen").forEach(s => s.classList.remove("active")); document.getElementById(id).classList.add("active"); }
+function setNav(id) { document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active")); document.getElementById(id).classList.add("active"); }
 
-function setScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-function setNav(id) {
-  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-// ── FILTERS & SEARCH ──
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     currentFilter = btn.dataset.type;
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    haptic("light");
-    renderMenu();
+    btn.classList.add("active"); haptic("light"); renderMenu();
   });
 });
 
-document.getElementById("searchInput").addEventListener("input", e => {
-  currentSearch = e.target.value;
-  renderMenu();
-});
+document.getElementById("searchInput").addEventListener("input", e => { currentSearch = e.target.value; renderMenu(); });
 
-// ── INIT ──
 renderMenu();
 updateCartUI();
 </script>
