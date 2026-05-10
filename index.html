@@ -3,7 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js">
+function createParticles() {
+    const container = document.getElementById('particles');
+    if (!container) return;
+    const particleCount = 20;
+    const colors = [
+        'rgba(220, 180, 80, 0.9)',
+        'rgba(197, 160, 89, 0.7)',
+        'rgba(240, 200, 100, 0.8)',
+        'rgba(180, 140, 60, 0.6)',
+        'rgba(255, 220, 120, 0.9)',
+    ];
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        const sizeType = Math.random();
+        let size, glowSize;
+        if (sizeType < 0.5) { size = Math.random() * 1.5 + 1; glowSize = 4; }
+        else if (sizeType < 0.85) { size = Math.random() * 1.5 + 2.5; glowSize = 8; }
+        else { size = Math.random() * 2 + 4; glowSize = 14; }
+        const left = Math.random() * 100;
+        const riseDuration = Math.random() * 7 + 8;
+        const twinkleDuration = Math.random() * 1 + 1;
+        const delay = Math.random() * 12;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = left + '%';
+        particle.style.background = color;
+        particle.style.boxShadow = `0 0 ${glowSize}px ${color}, 0 0 ${glowSize * 2}px rgba(197, 160, 89, 0.15)`;
+        particle.style.animationDuration = `${riseDuration}s, ${twinkleDuration}s`;
+        particle.style.animationDelay = `${delay}s, ${delay}s`;
+        container.appendChild(particle);
+    }
+}
+createParticles();
+</script>
+
 <title>Grato Menyu</title>
 <style>
 :root {
@@ -276,9 +313,46 @@ body { font-family: sans-serif; background: var(--bg); color: var(--text); min-h
 }
 .nav-item .icon-wrap { position:relative; display:inline-block; }
 .nav-item .badge.show { display:block; }
+
+/* Background particles */
+.bg-glow {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(220,180,80,0.03) 0%, rgba(15,15,15,1) 100%);
+    z-index: -2;
+    pointer-events: none;
+}
+.particles-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    z-index: -1;
+    pointer-events: none;
+}
+.particle {
+    position: absolute;
+    bottom: -10px;
+    border-radius: 50%;
+    animation: rise infinite linear, twinkle infinite alternate ease-in-out;
+}
+@keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+}
+@keyframes twinkle {
+    0% { opacity: 0.3; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1.2); }
+}
 </style>
+
 </head>
+
 <body>
+<div class="bg-glow"></div>
+<div class="particles-container" id="particles"></div>
+
 
 <div class="offline-banner" id="offlineBanner">📵 Internet aloqasi yo'q</div>
 <div class="toast" id="toast"></div>
@@ -411,37 +485,48 @@ if (tg) {
 }
 
 const MENU = [
-  { type:"first",  name:"Tushonka sho'rva",           price:40000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_1.webp" },
-  { type:"first",  name:"Balaza sho'rva",              price:25000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_2.webp" },
-  { type:"first",  name:"Frikadelki sho'rva",          price:25000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_3.webp" },
-  { type:"first",  name:"Solyanka sho'rva",            price:30000, img:"https://gratofood.github.io/gratofood/images/1-taom/optimized_5.webp" },
-  { type:"second", name:"Sosiska testa",               price:7000,  img:"https://gratofood.github.io/gratofood/images/optimized_batch2_3.webp" },
-  { type:"second", name:"Go'shtli somsa",              price:7000,  img:"https://gratofood.github.io/gratofood/images/optimized_batch2_4.webp" },
-  { type:"second", name:"Blinchik tvorog&banana",      price:6000,  img:"https://gratofood.github.io/gratofood/images/optimized_batch2_5.webp" },
-  { type:"second", name:"Go'shtli say",                price:45000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_6.webp" },
-  { type:"second", name:"Go'shtli chuchvara",          price:30000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_7.webp" },
-  { type:"second", name:"Turkcha sarmabetti",          price:25000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_8.webp" },
-  { type:"second", name:"Tovuqli say",                 price:40000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_9.webp" },
-  { type:"second", name:"Kotlet go'shtli",             price:15000, img:"https://gratofood.github.io/gratofood/images/optimized_batch2_10.webp" },
-  { type:"second", name:"Kotlet pomidor va pishloqli", price:18000, img:"https://gratofood.github.io/gratofood/images/0a68ac5d-39d2-421d-ba33-a57f5152e36f.jpg" },
-  { type:"second", name:"Tuxumbarak",                  price:5000,  img:"https://gratofood.github.io/gratofood/images/440dd845-7b92-4e6c-95b8-28743eb9c8dc.jpg" },
-  { type:"second", name:"Golubsi asorti",              price:30000, img:"https://gratofood.github.io/gratofood/images/51f46064-6c01-4552-823a-5b517f813886.jpg" },
-  { type:"second", name:"Tovuqli kotlet",              price:15000, img:"https://gratofood.github.io/gratofood/images/766bd7e7-283d-447d-800f-0a5f1086452a.jpg" },
-  { type:"second", name:"Tovuq va qo'ziqorinli rulet (kg)", price:100000, img:"https://gratofood.github.io/gratofood/images/94bf73f3-f60e-4aa0-a816-8e395b219659.jpg" },
-  { type:"second", name:"Teriyaki tovuqli",            price:40000, img:"https://gratofood.github.io/gratofood/images/b1e459ba-bb4b-4d63-b470-adee62580cab.jpg" },
-  { type:"second", name:"Tovuq va sabzavotli jiz (kg)",price:80000, img:"https://gratofood.github.io/gratofood/images/e9842175-63b3-4ac1-bc2e-9ba7f774d167.jpg" },
-  { type:"second", name:"Teriyaki go'shtli",           price:45000, img:"https://gratofood.github.io/gratofood/images/ebe4e868-3cd9-433b-8ed9-3db14619bc6e.jpg" },
-  { type:"second", name:"Podjarka",                    price:40000, img:"https://gratofood.github.io/gratofood/images/f24a2df8-9368-43db-b012-731a3cad5dac.jpg" },
-  { type:"second", name:"Qurutoba",                    price:70000, img:"https://gratofood.github.io/gratofood/images/Qurtoba.jpg" },
-  { type:"salat",  name:"Adana salati",                price:40000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Adana.webp" },
-  { type:"salat",  name:"Bahor salati",                price:30000, img:"https://gratofood.github.io/gratofood/images/Salatlar/BahorSalati.webp" },
-  { type:"salat",  name:"Baqlajon rulet",              price:40000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Baklajan rulet.webp" },
-  { type:"salat",  name:"Bavarskiy",                   price:30000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Bavarski.webp" },
-  { type:"salat",  name:"Fransuz salati",              price:30000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Fransuzki.webp" },
-  { type:"salat",  name:"Grato salati",                price:35000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Grato.webp" },
-  { type:"salat",  name:"Qarsildoq Baqlajon",          price:45000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Qarsildoq baqlajan.webp" },
-  { type:"salat",  name:"Seul",                        price:35000, img:"https://gratofood.github.io/gratofood/images/Salatlar/Seul.webp" },
-  { type:"salat",  name:"Vinegret",                    price:20000, img:"https://gratofood.github.io/gratofood/images/Salatlar/vinegret.webp" },
+  { type:"salat", name:"Grato salati", price:35000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Grato.PNG" },
+  { type:"salat", name:"Vinegret", price:20000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Vinegret.PNG" },
+  { type:"salat", name:"Seul", price:35000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Seul.PNG" },
+  { type:"salat", name:"Svejiy salat", price:20000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Sveji.PNG" },
+  { type:"salat", name:"Qarsildoq Baqlajon", price:45000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Qarsildoq%20Baqlajon.PNG" },
+  { type:"salat", name:"Bahor salati", price:30000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Bahor%20salati.jpg" },
+  { type:"salat", name:"Bavarskiy salat", price:30000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Bavarskiy.PNG" },
+  { type:"salat", name:"Baqlajon Rulet", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Baqlajon%20Rulet.PNG" },
+  { type:"salat", name:"Fransuz salati", price:30000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Fransuzki.PNG" },
+  { type:"salat", name:"Adana", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Adana.PNG" },
+  { type:"salat", name:"Mujskoy Kapriz", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20salat/Mujskoy%20kapriz.jpg" },
+
+  { type:"first", name:"Frikadelki sho'rva", price:25000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Frikadelki%20sho'rva.PNG" },
+  { type:"first", name:"Tushonka sho'rva", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Tushonka%20sho'rva.PNG" },
+  { type:"first", name:"Solyanka", price:30000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Solyanka.PNG" },
+
+  { type:"second", name:"Asorti Golubsi", price:35000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Asorti%20Golubsi.PNG" },
+  { type:"second", name:"Uyg'ur lag'mon", price:35000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Uyg'ur%20lag'mon.PNG" },
+  { type:"second", name:"Qovurma lag'mon", price:30000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Qovurma%20lag'mon.PNG" },
+  { type:"second", name:"Amlet", price:25000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Amlet.PNG" },
+  { type:"second", name:"Go'shtli kotlet", price:15000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Go'shtli%20kotlet.PNG" },
+  { type:"second", name:"Tovuqli Kotlet", price:15000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Tovuqli%20Kotlet.PNG" },
+  { type:"second", name:"Go'sht+pomidor+sir li kotlet", price:18000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Go'sht+pomidor+sir%20li%20kotlet.PNG" },
+  { type:"second", name:"Go'shtli chuchvara", price:25000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Go'shtli%20chuchvara.PNG" },
+  { type:"second", name:"Ismaloqli chuchvara", price:20000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Ismaloqli%20chuchvara.PNG" },
+  { type:"second", name:"Grato Burger", price:30000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Grato%20Burger.jpg" },
+  { type:"second", name:"Go'shtli say", price:45000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Go'shtli%20say.PNG" },
+  { type:"second", name:"Tovuqli Say", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Tovuqli%20Say.PNG" },
+  { type:"second", name:"Grato Jiz(Sabzavotli)", price:65000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Grato%20Jiz(Sabzavotli).jpg" },
+  { type:"second", name:"Grato Jiz Tovuq(Sabzavotli)", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Grato%20Jiz%20Tovuq(Sabzavotli).jpg" },
+  { type:"second", name:"Grato nonushtasi", price:35000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Grato%20nonushtasi.PNG" },
+  { type:"second", name:"Jigar Vag'uri", price:60000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Jigar%20Vag'uri.jpg" },
+  { type:"second", name:"KFS", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/KFS.PNG" },
+  { type:"second", name:"Manti", price:6000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Manti.PNG" },
+  { type:"second", name:"Podjarka", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Podjarka.JPG" },
+  { type:"second", name:"Qurutob", price:70000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Qurutob.jpg" },
+  { type:"second", name:"Sabzavotli Jigar", price:120000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Sabzavotli%20Jigar.jpg" },
+  { type:"second", name:"Sixcha Kabob", price:65000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Sixcha%20Kabob.jpg" },
+  { type:"second", name:"Teriyaki go'shtli", price:45000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Teriyaki%20go'shtli.PNG" },
+  { type:"second", name:"Teriyaki Tovuqli", price:40000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Teriyaki%20Tovuqli.PNG" },
+  { type:"second", name:"Tovuqli Rulet", price:25000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Tovuqli%20Rulet.PNG" },
+  { type:"second", name:"Turkcha Sarma Beyti", price:25000, img:"https://gratofood.github.io/cafe-only-menu-/photo%20ovqat/Turkcha%20Sarma%20Beyti.PNG" }
 ];
 
 const PROMO_CODES = { "GRATO10": 10, "GRATO20": 20 };
